@@ -1,4 +1,4 @@
-Roundcube Webmail 
+Roundcube Webmail - Support login with EAI mail
 =================
 [roundcube.net](https://roundcube.net)
 
