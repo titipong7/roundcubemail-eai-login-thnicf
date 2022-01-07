@@ -114,6 +114,21 @@ if ($RCMAIL->task == 'login' && $RCMAIL->action == 'login') {
             'cookiecheck' => true,
     ]);
 
+    //Find English email from EAI mail allow user to login with EAI mail
+    function map_users(&$auth){
+      $conn = new mysqli("localhost", "your-db-user", "your-db-password", "your-database");
+      if ($conn->connect_error) {
+          error_log("Connection failed: " . $conn->connect_error,0);
+      }
+      //youremailmappingtable = the table that have record of your EAI mail and english email from $auth['user']
+      $result = $conn->query("SELECT yourenglishemail FROM youremailmappingtable WHERE source='".$auth['user']."'");
+      if ($result->num_rows > 0) {
+          $row = $result->fetch_row();
+          $auth['user'] = $row['0'];
+      }
+    }
+    map_users($auth);
+
     // Login
     if ($auth['valid'] && !$auth['abort']
         && $RCMAIL->login($auth['user'], $auth['pass'], $auth['host'], $auth['cookiecheck'])
