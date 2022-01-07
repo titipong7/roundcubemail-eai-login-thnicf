@@ -6,11 +6,12 @@ Roundcube Webmail - Support login with EAI mail
 
 ATTENTION
 ---------
-This is just a snapshot from the GIT repository and is **NOT A STABLE
+1. This is just a snapshot from the GIT repository and is **NOT A STABLE
 version of Roundcube**. It's not recommended to replace an existing installation
 of Roundcube with this version. Also using a separate database for this
 installation is highly recommended.
 
+2. This is a modified version by [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/) to make a Roundcube Webmail can loging by using EAI (Email Address Internationalization) focus on Thai language. 
 
 INTRODUCTION
 ------------
@@ -47,8 +48,37 @@ inherits the browser support from there. This currently includes:
 - Safari: (Current - 1) and Current
 - Opera: Current
 
-EAI SUPPORT
+How to make Roundcube can login with EAI mail
 ---------------
+Roundcube Webmail is used by [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/) and it is not UA-Ready (Universal Aceeptance) platform because it cannot use other languages email except English to login. Then, [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/) modified it by query English email when THNIC fondation users used Thai email.
+
+For example, ไทย@อีเอไอ.ไทย and thai@eai.in.th, the added function will find thai@eai.in.th and use it as username for login instead of อีเอไอ@คน.ไทย when users use Thai email to login.
+
+The function named "map_users" is in index.php:
+
+```
+function map_users(&$auth){
+  $conn = new mysqli("localhost", "your-db-user", "your-db-password", "your-database");
+  if ($conn->connect_error) {
+      error_log("Connection failed: " . $conn->connect_error,0);
+  }
+  //youremailmappingtable = the table that have record of your EAI mail and english email from $auth['user']
+  $result = $conn->query("SELECT yourenglishemail FROM youremailmappingtable WHERE youreaiemail='".$auth['user']."'");
+  if ($result->num_rows > 0) {
+      $row = $result->fetch_row();
+      $auth['user'] = $row['0'];
+  }
+}
+map_users($auth);
+```
+Here the basic sql for create mapping email table:
+
+```
+CREATE TABLE youremailmappingtable (youreaiemail varchar(80) NOT NULL, yourenglishemail TEXT NOT NULL, PRIMARY KEY (source) ); 
+INSERT INTO youremailmappingtable (youreaiemail,yourenglishemail) VALUES ('ไทย@อีเอไอ.ไทย','thai@eai.in.th');
+```
+
+This is not the best solution yet. Please feel free to fork or modified this repositories.
 
 LICENSE
 -------
