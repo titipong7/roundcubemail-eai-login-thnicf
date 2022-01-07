@@ -74,7 +74,7 @@ map_users($auth);
 Here the basic sql for create mapping email table:
 
 ```
-CREATE TABLE youremailmappingtable (youreaiemail varchar(80) NOT NULL, yourenglishemail TEXT NOT NULL, PRIMARY KEY (source) ); 
+CREATE TABLE youremailmappingtable (youreaiemail varchar(80) NOT NULL, yourenglishemail TEXT NOT NULL, PRIMARY KEY (youreaiemail) ); 
 INSERT INTO youremailmappingtable (youreaiemail,yourenglishemail) VALUES ('ไทย@อีเอไอ.ไทย','thai@eai.in.th');
 ```
 
