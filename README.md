@@ -1,4 +1,4 @@
-Roundcube Webmail - Support login with EAI mail
+Roundcube Webmail - Support login with EAI mail by THNIC Foundation
 =================
 [roundcube.net](https://roundcube.net)
 
