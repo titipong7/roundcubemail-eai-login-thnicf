@@ -47,6 +47,8 @@ inherits the browser support from there. This currently includes:
 - Safari: (Current - 1) and Current
 - Opera: Current
 
+EAI SUPPORT
+---------------
 
 LICENSE
 -------
