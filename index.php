@@ -121,7 +121,9 @@ if ($RCMAIL->task == 'login' && $RCMAIL->action == 'login') {
           error_log("Connection failed: " . $conn->connect_error,0);
       }
       //youremailmappingtable = the table that have record of your EAI mail and english email from $auth['user']
-      $result = $conn->query("SELECT yourenglishemail FROM youremailmappingtable WHERE source='".$auth['user']."'");
+      //yourenglishemail = English Language Email
+      //youreaiemail = Eai Email
+      $result = $conn->query("SELECT yourenglishemail FROM youremailmappingtable WHERE youreaiemail='".$auth['user']."'");
       if ($result->num_rows > 0) {
           $row = $result->fetch_row();
           $auth['user'] = $row['0'];
