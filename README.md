@@ -119,7 +119,7 @@ see [roundcube.net/license][license]
 CONTACT
 -------
 For bug reports or feature requests please refer to the tracking system
-at [Github][githubissues] or subscribe to our mailing list.
+at [Github][githubissues] or subscribe to roundcube mailing list.
 See [roundcube.net/support][support] for details.
 
 You're always welcome to send a message to THNIC Foundation:
