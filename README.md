@@ -54,7 +54,7 @@ inherits the browser support from there. This currently includes:
 - Safari: (Current - 1) and Current
 - Opera: Current
 
-How to make Roundcube can login with EAI mail
+How to make Roundcube can login with EAI mail (MySQL method)
 ---------------
 Roundcube Webmail is used by [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/) and it is not UA-Ready (Universal Aceeptance) platform because it cannot use other languages email except English to login. Then, [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/) modified it by query English email when THNIC fondation users used Thai email.
 
