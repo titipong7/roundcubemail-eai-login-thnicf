@@ -2,6 +2,8 @@ Roundcube Webmail - Support login with EAI mail by THNIC Foundation
 =================
 [roundcube.net](https://roundcube.net)
 
+[THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
+
 [![Tests Status](https://github.com/roundcube/roundcubemail/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/roundcube/roundcubemail/actions/workflows/tests.yml)
 
 ATTENTION
@@ -25,6 +27,8 @@ easily extendable and the user interface is fully customizable using skins.
 The code designed to run on a webserver is mainly written in PHP and Javascript.
 It includes a custom framework with an IMAP library derived from [IlohaMail][iloha]
 and requires a set of external libraries (see composer.json and jsdeps.json files).
+
+THNIC Foundation forked and modified code to support login by [EAI email](https://xn--12cn4frcvb5f.xn--o3cw4h/%e0%b8%8a%e0%b8%b7%e0%b9%88%e0%b8%ad%e0%b8%ad%e0%b8%b5%e0%b9%80%e0%b8%a1%e0%b8%a5%e0%b8%a0%e0%b8%b2%e0%b8%a9%e0%b8%b2%e0%b9%84%e0%b8%97%e0%b8%a2-eai/)
 
 
 INSTALLATION
@@ -110,22 +114,19 @@ For more details about licensing and the exceptions for skins and plugins
 see [roundcube.net/license][license]
 
 
-CONTRIBUTION
-------------
-Want to help make Roundcube the best webmail solution ever?
-Roundcube is open source software. Our developers and contributors all
-are volunteers and we're always looking for new additions and resources.
-For more information visit [roundcube.net/contribute][contrib]
-
-
 CONTACT
 -------
 For bug reports or feature requests please refer to the tracking system
 at [Github][githubissues] or subscribe to our mailing list.
 See [roundcube.net/support][support] for details.
 
-You're always welcome to send a message to the project admin:
-hello(at)roundcube(dot)net
+You're always welcome to send a message to THNIC Foundation:
+info(at)thnic(dot)or(dot)th.
+
+MORE INFORMATION
+----------------
+[THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
+[รู้จัก.ไทย](https://xn--12cn4frcvb5f.xn--o3cw4h/)
 
 
 [iloha]:        https://sourceforge.net/projects/ilohamail/
