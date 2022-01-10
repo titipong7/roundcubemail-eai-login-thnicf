@@ -1,8 +1,8 @@
 Roundcube Webmail - Support login with EAI mail by THNIC Foundation
 =================
-[roundcube.net](https://roundcube.net)
+1. [roundcube.net](https://roundcube.net)
 
-[THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
+2. [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
 
 [![Tests Status](https://github.com/roundcube/roundcubemail/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/roundcube/roundcubemail/actions/workflows/tests.yml)
 
@@ -125,8 +125,9 @@ info(at)thnic(dot)or(dot)th.
 
 MORE INFORMATION
 ----------------
-[THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
-[รู้จัก.ไทย](https://xn--12cn4frcvb5f.xn--o3cw4h/)
+1. [THNIC foundation](https://xn--42cl2bj2hxbd2g.xn--12cfi8ixb8l.xn--o3cw4h/)
+
+2. [รู้จัก.ไทย](https://xn--12cn4frcvb5f.xn--o3cw4h/)
 
 
 [iloha]:        https://sourceforge.net/projects/ilohamail/
