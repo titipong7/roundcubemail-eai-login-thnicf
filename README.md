@@ -84,6 +84,12 @@ CREATE TABLE youremailmappingtable (youreaiemail varchar(80) NOT NULL, yourengli
 INSERT INTO youremailmappingtable (youreaiemail,yourenglishemail) VALUES ('ไทย@อีเอไอ.ไทย','thai@eai.in.th');
 ```
 
+Also we have modified 3 files to make Adress book and Sending EAI mail working:
+
+1. rcmail_sendmail.php
+2. rcube_utils.php
+3. rcube_user.php
+
 This is not the best solution yet. Please feel free to fork or modified this repositories.
 
 LICENSE
