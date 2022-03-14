@@ -17,3 +17,4 @@
 $labels['help'] = 'സഹായം';
 $labels['about'] = 'വിവരം';
 $labels['license'] = 'അനുമതി';
+?>

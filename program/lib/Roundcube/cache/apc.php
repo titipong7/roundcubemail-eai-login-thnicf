@@ -20,7 +20,7 @@
 */
 
 /**
- * Interface implementation class for accessing APC cache
+ * Interface class for accessing APC cache
  *
  * @package    Framework
  * @subpackage Cache
@@ -36,11 +36,18 @@ class rcube_cache_apc extends rcube_cache
 
 
     /**
-     * {@inheritdoc}
+     * Object constructor.
+     *
+     * @param int    $userid User identifier
+     * @param string $prefix Key name prefix
+     * @param string $ttl    Expiration time of memcache/apc items
+     * @param bool   $packed Enables/disabled data serialization.
+     *                       It's possible to disable data serialization if you're sure
+     *                       stored data will be always a safe string
      */
-    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true, $indexed = false)
+    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true)
     {
-        parent::__construct($userid, $prefix, $ttl, $packed, $indexed);
+        parent::__construct($userid, $prefix, $ttl, $packed);
 
         $rcube = rcube::get_instance();
 
@@ -93,7 +100,7 @@ class rcube_cache_apc extends rcube_cache
      * @param string $key  Cache internal key name
      * @param mixed  $data Serialized cache data
      *
-     * @param bool True on success, False on failure
+     * @param boolean True on success, False on failure
      */
     protected function add_item($key, $data)
     {
@@ -119,7 +126,7 @@ class rcube_cache_apc extends rcube_cache
      *
      * @param string $key Cache internal key name
      *
-     * @param bool True on success, False on failure
+     * @param boolean True on success, False on failure
      */
     protected function delete_item($key)
     {

@@ -17,3 +17,4 @@
 $labels['help'] = 'Օգնություն';
 $labels['about'] = 'Նկարագիր';
 $labels['license'] = 'Արտոնագիր';
+?>

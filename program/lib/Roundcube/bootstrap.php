@@ -25,7 +25,7 @@
  * @subpackage Core
  */
 
-$config = [
+$config = array(
     'error_reporting' => E_ALL & ~E_NOTICE & ~E_STRICT,
     'display_errors'  => false,
     'log_errors'      => true,
@@ -33,16 +33,16 @@ $config = [
     // critical PHP settings here. Only these, which doesn't provide
     // an error/warning in the logs later. See (#1486307).
     'mbstring.func_overload' => 0,
-];
+);
 
 // check these additional ini settings if not called via CLI
 if (php_sapi_name() != 'cli') {
-    $config += [
+    $config += array(
         'suhosin.session.encrypt' => false,
         'file_uploads'            => true,
         'session.auto_start'      => false,
         'zlib.output_compression' => false,
-    ];
+    );
 }
 
 foreach ($config as $optname => $optval) {
@@ -58,7 +58,7 @@ foreach ($config as $optname => $optval) {
 }
 
 // framework constants
-define('RCUBE_VERSION', '1.6-git');
+define('RCUBE_VERSION', '1.4.4');
 define('RCUBE_CHARSET', 'UTF-8');
 define('RCUBE_TEMP_FILE_PREFIX', 'RCMTEMP');
 
@@ -109,18 +109,14 @@ PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, function($err) { rcube::raise_error(
  * @param string $needle   Needle value
  * @param array  $heystack Array to search in
  *
- * @return bool True if found, False if not
+ * @return boolean True if found, False if not
  */
 function in_array_nocase($needle, $haystack)
 {
-    if (!is_string($needle) || !is_array($haystack)) {
-        return false;
-    }
-
     // use much faster method for ascii
     if (is_ascii($needle)) {
         foreach ((array) $haystack as $value) {
-            if (is_string($value) && strcasecmp($value, $needle) === 0) {
+            if (strcasecmp($value, $needle) === 0) {
                 return true;
             }
         }
@@ -128,7 +124,7 @@ function in_array_nocase($needle, $haystack)
     else {
         $needle = mb_strtolower($needle);
         foreach ((array) $haystack as $value) {
-            if (is_string($value) && $needle === mb_strtolower($value)) {
+            if ($needle === mb_strtolower($value)) {
                 return true;
             }
         }
@@ -149,8 +145,6 @@ function parse_bytes($str)
     if (is_numeric($str)) {
         return floatval($str);
     }
-
-    $bytes = 0;
 
     if (preg_match('/([0-9\.]+)\s*([a-z]*)/i', $str, $regs)) {
         $bytes = floatval($regs[1]);
@@ -283,7 +277,7 @@ function abbreviate_string($str, $maxlength, $placeholder = '...', $ending = fal
  */
 function array_keys_recursive($array)
 {
-    $keys = [];
+    $keys = array();
 
     if (!empty($array) && is_array($array)) {
         foreach ($array as $key => $child) {
@@ -298,23 +292,6 @@ function array_keys_recursive($array)
 }
 
 /**
- * Get first element from an array
- *
- * @param array $array Input array
- *
- * @return mixed First element if found, Null otherwise
- */
-function array_first($array)
-{
-    if (is_array($array)) {
-        reset($array);
-        foreach ($array as $element) {
-            return $element;
-        }
-    }
-}
-
-/**
  * Remove all non-ascii and non-word chars except ., -, _
  *
  * @param string $str          A string
@@ -326,7 +303,7 @@ function array_first($array)
 function asciiwords($str, $css_id = false, $replace_with = '')
 {
     $allowed = 'a-z0-9\_\-' . (!$css_id ? '\.' : '');
-    return preg_replace("/[^$allowed]+/i", $replace_with, (string) $str);
+    return preg_replace("/[^$allowed]/i", $replace_with, $str);
 }
 
 /**
@@ -340,7 +317,7 @@ function asciiwords($str, $css_id = false, $replace_with = '')
 function is_ascii($str, $control_chars = true)
 {
     $regexp = $control_chars ? '/[^\x00-\x7F]/' : '/[^\x20-\x7E]/';
-    return preg_match($regexp, (string) $str) ? false : true;
+    return preg_match($regexp, $str) ? false : true;
 }
 
 /**
@@ -399,10 +376,74 @@ function format_email($email)
 function version_parse($version)
 {
     return str_replace(
-        ['-stable', '-git'],
-        ['.0', '.99'],
+        array('-stable', '-git'),
+        array('.0', '.99'),
         $version
     );
+}
+
+// intl replacement functions
+
+if (!function_exists('idn_to_utf8'))
+{
+    /**
+     * Convert domain name from IDNA ASCII to Unicode
+     *
+     * @param string $domain Domain to convert in an IDNA ASCII-compatible format.
+     *
+     * @return string|false Unicode domain, False on failure
+     */
+    function idn_to_utf8($domain)
+    {
+        static $idn, $loaded;
+
+        if (!$loaded) {
+            $idn    = new Net_IDNA2(array('version' => '2008'));
+            $loaded = true;
+        }
+
+        if ($idn && $domain && preg_match('/(^|\.)xn--/i', $domain)) {
+            try {
+                $domain = $idn->decode($domain);
+            }
+            catch (Exception $e) {
+                return false;
+            }
+        }
+
+        return $domain;
+    }
+}
+
+if (!function_exists('idn_to_ascii'))
+{
+    /**
+     * Convert domain name to IDNA ASCII-compatible form Unicode
+     *
+     * @param string $domain The domain to convert, which must be UTF-8 encoded
+     *
+     * @return string|false The domain name encoded in ASCII-compatible form, False on failure
+     */
+    function idn_to_ascii($domain)
+    {
+        static $idn, $loaded;
+
+        if (!$loaded) {
+            $idn    = new Net_IDNA2(array('version' => '2008'));
+            $loaded = true;
+        }
+
+        if ($idn && $domain && preg_match('/[^\x20-\x7E]/', $domain)) {
+            try {
+                $domain = $idn->encode($domain);
+            }
+            catch (Exception $e) {
+                return false;
+            }
+        }
+
+        return $domain;
+    }
 }
 
 /**

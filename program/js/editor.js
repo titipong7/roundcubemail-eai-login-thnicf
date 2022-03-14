@@ -39,18 +39,13 @@ function rcube_text_editor(config, id)
     abs_url = location.href.replace(/[?#].*$/, '').replace(/\/$/, ''),
     conf = {
       selector: '#' + ($('#' + id).is('.mce_editor') ? id : 'fake-editor-id'),
-      readonly: $('#' + id).is('[readonly],[disabled]'),
-      cache_suffix: 's=5080200',
-      theme: 'silver',
+      cache_suffix: 's=4080200',
+      theme: 'modern',
       language: config.lang,
       content_css: rcmail.assets_path(config.content_css),
-      content_style: config.content_style,
       menubar: false,
       statusbar: false,
-      // toolbar_sticky: true, // does not work in scrollable element: https://github.com/tinymce/tinymce/issues/5227
-      toolbar_drawer: 'sliding',
-      toolbar: 'bold italic underline | alignleft aligncenter alignright alignjustify'
-        + ' | fontselect fontsizeselect | forecolor backcolor',
+      toolbar_items_size: 'small',
       extended_valid_elements: 'font[face|size|color|style],span[id|class|align|style]',
       fontsize_formats: '8pt 9pt 10pt 11pt 12pt 14pt 18pt 24pt 36pt',
       // Allow style tag, have to be allowed inside body/div/blockquote (#7088)
@@ -60,19 +55,10 @@ function rcube_text_editor(config, id)
       convert_urls: false, // #1486944
       image_description: false,
       paste_webkit_style: "color font-size font-family",
-      automatic_uploads: false, // allows to paste images
       paste_data_images: true,
-      // Note: We disable contextmenu options specifically for browser_spellcheck:true.
-      //       Otherwise user would have to use Right-Click with CTRL to get to
-      //       the browser's spellchecker options. Should you disable browser_spellcheck
-      //       you can enable other contextmenu options (by removing these options below).
       browser_spellcheck: true,
-      contextmenu: 'spellchecker',
       anchor_bottom: false,
-      anchor_top: false,
-      file_picker_types: 'image media',
-      file_picker_callback: function(callback, value, meta) { ref.file_picker_callback(callback, value, meta); },
-      min_height: config.mode == 'identity' ? 100 : 400
+      anchor_top: false
     };
 
   // register spellchecker for plain text editor
@@ -97,22 +83,30 @@ function rcube_text_editor(config, id)
   }
 
   // minimal editor
-  if (config.mode == 'identity' || config.mode == 'response') {
-    conf.toolbar += ' | charmap hr link unlink image code $extra';
+  if (config.mode == 'identity') {
     $.extend(conf, {
-      plugins: 'autolink charmap code hr image link paste tabfocus',
-      file_picker_types: 'image'
+      plugins: 'autolink charmap code colorpicker hr image link paste tabfocus textcolor',
+      toolbar: 'bold italic underline alignleft aligncenter alignright alignjustify'
+        + ' | outdent indent charmap hr link unlink image code forecolor'
+        + ' | fontselect fontsizeselect',
+      file_browser_callback: function(name, url, type, win) { ref.file_browser_callback(name, url, type); },
+      file_browser_callback_types: 'image'
     });
   }
   // full-featured editor
   else {
-    conf.toolbar += ' | bullist numlist outdent indent ltr rtl blockquote'
-        + ' | link unlink table | $extra charmap image media | code searchreplace undo redo',
     $.extend(conf, {
-      plugins: 'autolink charmap code directionality link lists image media nonbreaking'
-        + ' paste table tabfocus searchreplace spellchecker',
+      plugins: 'autolink charmap code colorpicker directionality link lists image media nonbreaking'
+        + ' paste table tabfocus textcolor searchreplace spellchecker',
+      toolbar: 'bold italic underline | alignleft aligncenter alignright alignjustify'
+        + ' | bullist numlist outdent indent ltr rtl blockquote | forecolor backcolor | fontselect fontsizeselect'
+        + ' | link unlink table | $extra charmap image media | code searchreplace undo redo',
       spellchecker_rpc_url: abs_url + '/?_task=utils&_action=spell_html&_remote=1',
-      spellchecker_language: rcmail.env.spell_lang
+      spellchecker_language: rcmail.env.spell_lang,
+      accessibility_focus: false,
+      file_browser_callback: function(name, url, type, win) { ref.file_browser_callback(name, url, type); },
+      // @todo: support more than image (types: file, image, media)
+      file_browser_callback_types: 'image media'
     });
   }
 
@@ -182,7 +176,7 @@ function rcube_text_editor(config, id)
 
     if (rcmail.env.action == 'compose') {
       var area = $('#' + this.id),
-        height = $('div.tox-toolbar__group', area.parent()).first().height();
+        height = $('div.mce-toolbar-grp', area.parent()).first().height();
 
       // the editor might be still not fully loaded, making the editing area
       // inaccessible, wait and try again (#1490310)
@@ -190,8 +184,18 @@ function rcube_text_editor(config, id)
         return setTimeout(function () { ref.init_callback(editor); }, 300);
       }
 
-      var elem = rcube_find_object('_from'),
+      var css = {},
+        elem = rcube_find_object('_from'),
         fe = rcmail.env.compose_focus_elem;
+
+      if (rcmail.env.default_font)
+        css['font-family'] = rcmail.env.default_font;
+
+      if (rcmail.env.default_font_size)
+        css['font-size'] = rcmail.env.default_font_size;
+
+      if (css['font-family'] || css['font-size'])
+        $(this.editor.getBody()).css(css);
 
       if (elem && elem.type == 'select-one') {
         // insert signature (only for the first time)
@@ -260,12 +264,6 @@ function rcube_text_editor(config, id)
     this.force_focus = false;
   };
 
-  // Returns current editor mode
-  this.is_html = function()
-  {
-    return !!this.editor;
-  };
-
   // switch html/plain mode
   this.toggle = function(ishtml, noconvert)
   {
@@ -329,7 +327,7 @@ function rcube_text_editor(config, id)
         tinymce.execCommand('mceRemoveEditor', false, ref.id);
         ref.editor = null;
 
-        // replace signature mark with text version of the signature
+        // replace signture mark with text version of the signature
         if (is_sig)
           data = data.replace(sig_mark, "\n" + signature.text);
 
@@ -394,7 +392,7 @@ function rcube_text_editor(config, id)
       return ed.state != 'ready' && ed.state != 'no_error_found';
   };
 
-  // resume spellchecking, highlight provided misspellings without a new ajax request
+  // resume spellchecking, highlight provided mispellings without a new ajax request
   this.spellcheck_resume = function(data)
   {
     var ed = this.editor;
@@ -656,27 +654,21 @@ function rcube_text_editor(config, id)
   };
 
   // image selector
-  this.file_picker_callback = function(callback, value, meta)
+  this.file_browser_callback = function(field_name, url, type)
   {
     var i, button, elem, cancel, dialog, fn, hint, list = [],
-      type = meta.filetype,
       form = $('.upload-form').clone();
 
     // open image selector dialog
     this.editor.windowManager.open({
       title: rcmail.get_label('select' + type),
-      body: {
-        type: 'panel',
-        items: [{
-          type: 'htmlpanel',
-          html: '<div id="image-selector" class="image-selector file-upload"><ul id="image-selector-list" class="attachmentslist"></ul></div>',
-        }]
-      },
-      buttons: [{type: 'cancel', text: rcmail.get_label('close'), onclick: function() { ref.file_picker_close(); }}]
+      width: 500,
+      html: '<div id="image-selector" class="image-selector file-upload"><ul id="image-selector-list" class="attachmentslist"></ul></div>',
+      buttons: [{text: rcmail.get_label('close'), onclick: function() { ref.file_browser_close(); }}]
     });
 
-    rcmail.env.file_picker_callback = callback;
-    rcmail.env.file_picker_type = type;
+    rcmail.env.file_browser_field = field_name;
+    rcmail.env.file_browser_type = type;
 
     dialog = $('#image-selector');
 
@@ -689,17 +681,14 @@ function rcube_text_editor(config, id)
       .text(rcmail.get_label('add' + type))
       .focus();
 
-    if (!button.is('.btn'))
-      button.addClass('tox-button');
-
     // fill images list with available images
     for (i in rcmail.env.attachments) {
-      if (elem = ref.file_picker_entry(i, rcmail.env.attachments[i])) {
+      if (elem = ref.file_browser_entry(i, rcmail.env.attachments[i])) {
         list.push(elem);
       }
     }
 
-    cancel = dialog.parents('.tox-dialog').find('button').last();
+    cancel = dialog.parent().parent().find('button').last().parent();
 
     // Add custom Tab key handlers, tabindex does not work
     list = $('#image-selector-list').append(list).on('keydown', 'li', function(e) {
@@ -765,7 +754,7 @@ function rcube_text_editor(config, id)
       rcmail.env['file_dialog_event+' + type] = true;
       rcmail.addEventListener('fileuploaded', function(attr) {
         var elem;
-        if (elem = ref.file_picker_entry(attr.name, attr.attachment)) {
+        if (elem = ref.file_browser_entry(attr.name, attr.attachment)) {
           list.prepend(elem);
           elem.focus();
         }
@@ -776,19 +765,23 @@ function rcube_text_editor(config, id)
   };
 
   // close file browser window
-  this.file_picker_close = function(url)
+  this.file_browser_close = function(url)
   {
-    this.editor.windowManager.close();
+    var input = $('#' + rcmail.env.file_browser_field);
 
     if (url)
-      rcmail.env.file_picker_callback(url);
+      input.val(url);
+
+    this.editor.windowManager.close();
+
+    input.focus();
 
     if (rcmail.env.old_file_drop)
       rcmail.gui_objects.filedrop = rcmail.env.old_file_drop;
   };
 
   // creates file browser entry
-  this.file_picker_entry = function(file_id, file)
+  this.file_browser_entry = function(file_id, file)
   {
     if (!file.complete || !file.mimetype) {
       return;
@@ -800,7 +793,7 @@ function rcube_text_editor(config, id)
 
     var rx, img_src;
 
-    switch (rcmail.env.file_picker_type) {
+    switch (rcmail.env.file_browser_type) {
       case 'image':
         rx = /^image\//i;
         break;
@@ -824,10 +817,10 @@ function rcube_text_editor(config, id)
         .data('url', href)
         .append($('<span class="img">').append(img))
         .append($('<span class="name">').text(file.name))
-        .click(function() { ref.file_picker_close($(this).data('url')); })
+        .click(function() { ref.file_browser_close($(this).data('url')); })
         .keydown(function(e) {
           if (e.which == 13) {
-            ref.file_picker_close($(this).data('url'));
+            ref.file_browser_close($(this).data('url'));
           }
         });
     }

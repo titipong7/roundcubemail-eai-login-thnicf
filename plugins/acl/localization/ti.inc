@@ -63,3 +63,4 @@ $labels['longaclw'] = 'ዕላማትን መፍትሕ ቃላትን መልኽትታ
 $labels['longacli'] = 'መልእኽቲ ናብዚ ማህደር ክጽሓፍ ወይ ክቕዳሕ ይኽእል';
 $labels['longaclp'] = 'መልእኽቲ ናብዚ ማህደር ክኣቱ ይኽእል';
 $labels['longaclread'] = 'ማህደር ተኸፊቱ ክንበብ ይኽእል';
+?>

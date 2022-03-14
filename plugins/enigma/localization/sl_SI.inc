@@ -25,3 +25,4 @@ $labels['createkeys'] = 'Ustvari nov par ključev';
 $labels['keychpass'] = 'Spremenjeno geslo';
 $labels['newkeypass'] = 'Geslo';
 $labels['keyimportlabel'] = 'Uvozi iz dokumenta';
+?>

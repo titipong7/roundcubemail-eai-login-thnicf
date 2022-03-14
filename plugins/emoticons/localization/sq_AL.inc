@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Shfaqi emotikonet në mesazhe tekst të thjeshtë';
 $labels['emoticonscompose'] = 'Aktivizoni emotikonet';
+?>

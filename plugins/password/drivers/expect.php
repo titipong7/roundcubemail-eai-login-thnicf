@@ -22,7 +22,7 @@
  * password_expect_params => arguments for the expect script
  *   see the password-expect file for details. This is probably
  *   a good starting default:
- *   -telnet -host localhost -output /tmp/passwd.log -log /tmp/passwd.log
+ *   -telent -host localhost -output /tmp/passwd.log -log /tmp/passwd.log
  *
  * Copyright (C) The Roundcube Dev Team
  *
@@ -59,13 +59,12 @@ class rcube_expect_password
             return PASSWORD_SUCCESS;
         }
 
-        rcube::raise_error([
+        rcube::raise_error(array(
                 'code' => 600,
-                'file' => __FILE__,
-                'line' => __LINE__,
+                'type' => 'php',
+                'file' => __FILE__, 'line' => __LINE__,
                 'message' => "Password plugin: Unable to execute $cmd"
-            ], true, false
-        );
+            ), true, false);
 
         return PASSWORD_ERROR;
     }

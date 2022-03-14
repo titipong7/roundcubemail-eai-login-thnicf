@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'An fillteán bunaidh';
 $labels['archivetypesender'] = 'Seoladh ríomhphoist an tseoltóra';
 $labels['unkownsender'] = 'anaithnid';
 $labels['readonarchive'] = 'Rianaigh an teachtaireacht mar léite sa chartlann';
+?>

@@ -18,7 +18,7 @@ class enigma_error
 {
     private $code;
     private $message;
-    private $data = [];
+    private $data = array();
 
     // error codes
     const OK          = 0;
@@ -32,7 +32,7 @@ class enigma_error
     const NOMDC       = 8;
 
 
-    function __construct($code = null, $message = '', $data = [])
+    function __construct($code = null, $message = '', $data = array())
     {
         $this->code    = $code;
         $this->message = $message;
@@ -49,12 +49,8 @@ class enigma_error
         return $this->message;
     }
 
-    function getData($name = null)
+    function getData($name)
     {
-        if ($name) {
-            return $this->data[$name] ?? null;
-        }
-
-        return $this->data;
+        return $name ? $this->data[$name] : $this->data;
     }
 }

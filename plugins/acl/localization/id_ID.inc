@@ -95,3 +95,4 @@ $messages['createerror'] = 'Tidak dapat menambah hak akses';
 $messages['deleteconfirm'] = 'Apakah Anda yakin ingin menghapus hak akses dari user terpilih?';
 $messages['norights'] = 'Hak belum ditentukan!';
 $messages['nouser'] = 'Username belum ditentukan!';
+?>

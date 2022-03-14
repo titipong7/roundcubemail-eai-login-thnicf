@@ -178,21 +178,17 @@ class rcube_message_header
      *
      * @var array
      */
-    public $others = [];
+    public $others = array();
 
     /**
      * Message flags
      *
      * @var array
      */
-    public $flags = [];
+    public $flags = array();
 
-    /**
-     * Header name to rcube_message_header object property map
-     *
-     * @var array
-     */
-    private $obj_headers = [
+    // map header to rcube_message_header object property
+    private $obj_headers = array(
         'date'      => 'date',
         'from'      => 'from',
         'to'        => 'to',
@@ -207,33 +203,28 @@ class rcube_message_header
         'content-type'              => 'ctype',
         'charset'                   => 'charset',
         'references'                => 'references',
+        'return-receipt-to'         => 'mdn_to',
         'disposition-notification-to' => 'mdn_to',
         'x-confirm-reading-to'      => 'mdn_to',
         'message-id'                => 'messageID',
         'x-priority'                => 'priority',
-    ];
+    );
 
     /**
      * Returns header value
-     *
-     * @param string $name   Header name
-     * @param bool   $decode Decode the header content
-     *
-     * @param string|null Header content
      */
     public function get($name, $decode = true)
     {
-        $name  = strtolower($name);
-        $value = null;
+        $name = strtolower($name);
 
-        if (isset($this->obj_headers[$name]) && isset($this->{$this->obj_headers[$name]})) {
+        if (isset($this->obj_headers[$name])) {
             $value = $this->{$this->obj_headers[$name]};
         }
-        else if (isset($this->others[$name])) {
+        else {
             $value = $this->others[$name];
         }
 
-        if ($decode && $value !== null) {
+        if ($decode) {
             if (is_array($value)) {
                 foreach ($value as $key => $val) {
                     $val         = rcube_mime::decode_header($val, $this->charset);
@@ -251,9 +242,6 @@ class rcube_message_header
 
     /**
      * Sets header value
-     *
-     * @param string $name  Header name
-     * @param string $value Header content
      */
     public function set($name, $value)
     {
@@ -267,19 +255,18 @@ class rcube_message_header
         }
     }
 
+
     /**
      * Factory method to instantiate headers from a data array
      *
-     * @param array $arr Hash array with header values
-     *
-     * @return rcube_message_header instance filled with headers values
+     * @param array Hash array with header values
+     * @return object rcube_message_header instance filled with headers values
      */
     public static function from_array($arr)
     {
         $obj = new rcube_message_header;
-        foreach ($arr as $k => $v) {
+        foreach ($arr as $k => $v)
             $obj->set($k, $v);
-        }
 
         return $obj;
     }
@@ -291,11 +278,11 @@ class rcube_message_header
  *
  * @package    Framework
  * @subpackage Storage
+ * @author  Aleksander Machniak <alec@alec.pl>
  */
 class rcube_message_header_sorter
 {
-    /** @var array Message UIDs */
-    private $uids = [];
+    private $uids = array();
 
 
     /**
@@ -317,7 +304,7 @@ class rcube_message_header_sorter
      */
     function sort_headers(&$headers)
     {
-        uksort($headers, [$this, "compare_uids"]);
+        uksort($headers, array($this, "compare_uids"));
     }
 
     /**

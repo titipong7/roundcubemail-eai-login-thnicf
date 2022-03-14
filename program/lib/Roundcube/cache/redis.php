@@ -20,7 +20,7 @@
 */
 
 /**
- * Interface implementation class for accessing Redis cache
+ * Interface class for accessing Redis cache
  *
  * @package    Framework
  * @subpackage Cache
@@ -36,11 +36,18 @@ class rcube_cache_redis extends rcube_cache
 
 
     /**
-     * {@inheritdoc}
+     * Object constructor.
+     *
+     * @param int    $userid User identifier
+     * @param string $prefix Key name prefix
+     * @param string $ttl    Expiration time of memcache/apc items
+     * @param bool   $packed Enables/disabled data serialization.
+     *                       It's possible to disable data serialization if you're sure
+     *                       stored data will be always a safe string
      */
-    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true, $indexed = false)
+    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true)
     {
-        parent::__construct($userid, $prefix, $ttl, $packed, $indexed);
+        parent::__construct($userid, $prefix, $ttl, $packed);
 
         $rcube = rcube::get_instance();
 
@@ -64,13 +71,13 @@ class rcube_cache_redis extends rcube_cache
         if (!class_exists('Redis')) {
             self::$redis = false;
 
-            rcube::raise_error([
+            rcube::raise_error(array(
                     'code' => 604,
                     'type' => 'redis',
                     'line' => __LINE__,
                     'file' => __FILE__,
                     'message' => "Failed to find Redis. Make sure php-redis is included"
-                ],
+                ),
                 true, true);
         }
 
@@ -79,25 +86,25 @@ class rcube_cache_redis extends rcube_cache
 
         // host config is wrong
         if (!is_array($hosts) || empty($hosts)) {
-            rcube::raise_error([
+            rcube::raise_error(array(
                     'code' => 604,
                     'type' => 'redis',
                     'line' => __LINE__,
                     'file' => __FILE__,
                     'message' => "Redis host not configured"
-                ],
+                ),
                 true, true);
         }
 
         // only allow 1 host for now until we support clustering
         if (count($hosts) > 1) {
-            rcube::raise_error([
+            rcube::raise_error(array(
                     'code' => 604,
                     'type' => 'redis',
                     'line' => __LINE__,
                     'file' => __FILE__,
                     'message' => "Redis cluster not yet supported"
-                ],
+                ),
                 true, true);
         }
 
@@ -190,7 +197,7 @@ class rcube_cache_redis extends rcube_cache
             $data = self::$redis->get($key);
         }
         catch (Exception $e) {
-            rcube::raise_error($e, true, false);
+            raise_error($e, true, false);
             return false;
         }
 
@@ -207,7 +214,7 @@ class rcube_cache_redis extends rcube_cache
      * @param string $key  Cache internal key name
      * @param mixed  $data Serialized cache data
      *
-     * @param bool True on success, False on failure
+     * @param boolean True on success, False on failure
      */
     protected function add_item($key, $data)
     {
@@ -219,7 +226,7 @@ class rcube_cache_redis extends rcube_cache
             $result = self::$redis->setEx($key, $this->ttl, $data);
         }
         catch (Exception $e) {
-            rcube::raise_error($e, true, false);
+            raise_error($e, true, false);
             return false;
         }
 
@@ -235,7 +242,7 @@ class rcube_cache_redis extends rcube_cache
      *
      * @param string $key Cache internal key name
      *
-     * @param bool True on success, False on failure
+     * @param boolean True on success, False on failure
      */
     protected function delete_item($key)
     {
@@ -248,7 +255,7 @@ class rcube_cache_redis extends rcube_cache
             $result = self::$redis->$fname($key);
         }
         catch (Exception $e) {
-            rcube::raise_error($e, true, false);
+            raise_error($e, true, false);
             return false;
         }
 

@@ -35,24 +35,21 @@ class markasjunk_sa_detach
     {
         $rcube    = rcube::get_instance();
         $storage  = $rcube->storage;
-        $new_uids = [];
+        $new_uids = array();
 
         foreach ($uids as $uid) {
             $saved   = false;
             $message = new rcube_message($uid);
 
-            foreach ($message->attachments as $part) {
-                if (
-                    $part->ctype_primary == 'message'
-                    && $part->ctype_secondary == 'rfc822'
-                    && !empty($part->ctype_parameters['x-spam-type'])
-                    && $part->ctype_parameters['x-spam-type'] == 'original'
-                ) {
-                    $orig_message_raw = $message->get_part_body($part->mime_id);
+            if (count($message->attachments) > 0) {
+                foreach ($message->attachments as $part) {
+                    if ($part->ctype_primary == 'message' && $part->ctype_secondary == 'rfc822' && $part->ctype_parameters['x-spam-type'] == 'original') {
+                        $orig_message_raw = $message->get_part_body($part->mime_id);
 
-                    if ($saved = $storage->save_message($dst_mbox, $orig_message_raw)) {
-                        $rcube->output->command('markasjunk_move', null, [$uid]);
-                        array_push($new_uids, $saved);
+                        if ($saved = $storage->save_message($dst_mbox, $orig_message_raw)) {
+                            $rcube->output->command('markasjunk_move', null, array($uid));
+                            array_push($new_uids, $saved);
+                        }
                     }
                 }
             }

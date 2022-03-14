@@ -33,19 +33,19 @@ class rcube_mime_decode
      *
      * @var array
      */
-    protected $params = [
+    protected $params = array(
         'include_bodies'  => true,
         'decode_bodies'   => true,
         'decode_headers'  => true,
         'crlf'            => "\r\n",
         'default_charset' => RCUBE_CHARSET,
-    ];
+    );
 
 
     /**
      * Constructor.
      *
-     * Sets up the object, initialize the variables, and splits and
+     * Sets up the object, initialise the variables, and splits and
      * stores the header and body of the input.
      *
      * @param array $params An array of various parameters that determine
@@ -57,7 +57,7 @@ class rcube_mime_decode
      *              decode_headers - Whether to decode headers
      *              crlf           - CRLF type to use (CRLF/LF/CR)
      */
-    public function __construct($params = [])
+    public function __construct($params = array())
     {
         if (!empty($params)) {
             $this->params = array_merge($this->params, (array) $params);
@@ -82,10 +82,6 @@ class rcube_mime_decode
             $struct = $this->structure_part($struct);
         }
 
-        if ($struct) {
-            $struct->size = strlen($input);
-        }
-
         return $struct;
     }
 
@@ -102,14 +98,14 @@ class rcube_mime_decode
      */
     protected function do_decode($headers, $body, $default_ctype = 'text/plain')
     {
-        $return  = new rcube_message_part;
+        $return  = new stdClass;
         $headers = $this->parseHeaders($headers);
 
         foreach ($headers as $value) {
             $header_name = strtolower($value['name']);
 
             if (isset($return->headers[$header_name]) && !is_array($return->headers[$header_name])) {
-                $return->headers[$header_name]   = [$return->headers[$header_name]];
+                $return->headers[$header_name]   = array($return->headers[$header_name]);
                 $return->headers[$header_name][] = $value['value'];
             }
             else if (isset($return->headers[$header_name])) {
@@ -155,7 +151,7 @@ class rcube_mime_decode
 
             switch ($ctype) {
             case 'text/plain':
-                $encoding = $content_transfer_encoding['value'] ?? '7bit';
+                $encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
 
                 if ($this->params['include_bodies']) {
                     $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
@@ -164,7 +160,7 @@ class rcube_mime_decode
                 break;
 
             case 'text/html':
-                $encoding = $content_transfer_encoding['value'] ?? '7bit';
+                $encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
 
                 if ($this->params['include_bodies']) {
                     $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
@@ -198,15 +194,14 @@ class rcube_mime_decode
                 unset($obj);
 
                 if ($this->params['include_bodies']) {
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body) : $body;
+                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
                 }
 
                 break;
 
             default:
                 if ($this->params['include_bodies']) {
-                    $encoding = !empty($content_transfer_encoding['value']) ? $content_transfer_encoding['value'] : '7bit';
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
+                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $content_transfer_encoding['value']) : $body;
                 }
 
                 break;
@@ -249,7 +244,7 @@ class rcube_mime_decode
             $body = substr($body, 0, -$crlf_len);
         }
 
-        return [$header, $body];
+        return array($header, $body);
     }
 
     /**
@@ -261,8 +256,6 @@ class rcube_mime_decode
      */
     protected function parseHeaders($input)
     {
-        $return = [];
-
         if ($input !== '') {
             // Unfold the input
             $input   = preg_replace('/' . $this->params['crlf'] . "(\t| )/", ' ', $input);
@@ -270,17 +263,20 @@ class rcube_mime_decode
 
             foreach ($headers as $value) {
                 $hdr_name  = substr($value, 0, $pos = strpos($value, ':'));
-                $hdr_value = substr($value, $pos + 1);
+                $hdr_value = substr($value, $pos+1);
 
-                if (isset($hdr_value[0]) && $hdr_value[0] == ' ') {
+                if ($hdr_value[0] == ' ') {
                     $hdr_value = substr($hdr_value, 1);
                 }
 
-                $return[] = [
+                $return[] = array(
                     'name'  => $hdr_name,
                     'value' => $this->params['decode_headers'] ? $this->decodeHeader($hdr_value) : $hdr_value,
-                ];
+                );
             }
+        }
+        else {
+            $return = array();
         }
 
         return $return;
@@ -297,30 +293,15 @@ class rcube_mime_decode
      */
     protected function parseHeaderValue($input)
     {
-        $parts  = preg_split('/;\s*/', $input);
-        $return = [];
+        $parts = preg_split('/;\s*/', $input);
 
         if (!empty($parts)) {
             $return['value'] = trim($parts[0]);
 
             for ($n = 1; $n < count($parts); $n++) {
-                if (preg_match('/^([[:alnum:]]+)="?([^"]*)"?+/', $parts[$n], $matches)) {
-                    $return['other'][strtolower($matches[1])] = $matches[2];
-                }
-                // Support RFC2231 encoding
-                else if (preg_match('/^([[:alnum:]]+)\*([0-9]*)\*?="*([^"]+)"*/', $parts[$n], $matches)) {
-                    $key = strtolower($matches[1]);
-                    $val = $matches[3];
-
-                    if (preg_match("/^(([^']*)'[^']*')/", $val, $m)) {
-                        $val = rawurldecode(substr($val, strlen($m[0])));
-                    }
-
-                    if (isset($return['other'][$key])) {
-                        $return['other'][$key] .= $val;
-                    }
-                    else {
-                        $return['other'][$key] = $val;
+                if (preg_match_all('/(([[:alnum:]]+)="?([^"]*)"?\s?;?)+/i', $parts[$n], $matches)) {
+                    for ($i = 0; $i < count($matches[2]); $i++) {
+                        $return['other'][strtolower($matches[2][$i])] = $matches[3][$i];
                     }
                 }
             }
@@ -342,8 +323,7 @@ class rcube_mime_decode
      */
     protected function boundarySplit($input, $boundary)
     {
-        $tmp   = explode('--' . $boundary, $input);
-        $parts = [];
+        $tmp = explode('--' . $boundary, $input);
 
         for ($i = 1; $i < count($tmp)-1; $i++) {
             $parts[] = $tmp[$i];
@@ -387,24 +367,17 @@ class rcube_mime_decode
         $struct->ctype_secondary  = $part->ctype_secondary;
         $struct->ctype_parameters = $part->ctype_parameters;
 
-        if (!empty($part->headers['content-transfer-encoding'])) {
+        if ($part->headers['content-transfer-encoding']) {
             $struct->encoding = $part->headers['content-transfer-encoding'];
         }
 
-        if (!empty($part->ctype_parameters['charset'])) {
+        if ($part->ctype_parameters['charset']) {
             $struct->charset = $part->ctype_parameters['charset'];
         }
 
         // determine filename
-        if (!empty($part->d_parameters['filename'])) {
-            $filename = $part->d_parameters['filename'];
-        }
-        else if (!empty($part->ctype_parameters['name'])) {
-            $filename = $part->ctype_parameters['name'];
-        }
-
-        if (!empty($filename)) {
-            if (empty($this->params['decode_headers'])) {
+        if (($filename = $part->d_parameters['filename']) || ($filename = $part->ctype_parameters['name'])) {
+            if (!$this->params['decode_headers']) {
                 $filename = $this->decodeHeader($filename);
             }
 
@@ -412,11 +385,11 @@ class rcube_mime_decode
         }
 
         $struct->body        = $part->body;
-        $struct->size        = is_string($part->body) ? strlen($part->body) : 0;
+        $struct->size        = strlen($part->body);
         $struct->disposition = $part->disposition;
 
         $count = 0;
-        foreach ((array) $part->parts as $child_part) {
+        foreach ((array)$part->parts as $child_part) {
             $struct->parts[] = $this->structure_part($child_part, ++$count, $struct->mime_id);
         }
 

@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Zobrazovať emotikony v čisto textových správach';
 $labels['emoticonscompose'] = 'Zapnúť emotikony';
+?>

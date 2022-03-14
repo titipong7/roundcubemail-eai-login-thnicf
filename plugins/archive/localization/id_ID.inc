@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'Folder asli';
 $labels['archivetypesender'] = 'Email pengirim';
 $labels['unkownsender'] = 'Tidak dikenal';
 $labels['readonarchive'] = 'Tandai pesan telah dibaca di arsip';
+?>

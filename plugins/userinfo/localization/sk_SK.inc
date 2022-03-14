@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Informácie o používateľovi';
-$labels['infoforuser'] = 'Informácia pre používateľa $user';
 $labels['created'] = 'Vytvorené';
 $labels['lastlogin'] = 'Posledné prihlásenie';
 $labels['defaultidentity'] = 'Predvolená identita';
-$labels['userid'] = 'ID';

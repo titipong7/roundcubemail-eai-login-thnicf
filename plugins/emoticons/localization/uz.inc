@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Matnli xabarlarda smayliklar tasvirlansinmi?';
 $labels['emoticonscompose'] = 'Smayliklarni faollashtirish';
+?>

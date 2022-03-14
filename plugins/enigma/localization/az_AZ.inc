@@ -21,3 +21,4 @@ $labels['subkeycreated'] = 'Yaradılma tarixi';
 $labels['expiresnever'] = 'heç vaxt';
 $labels['unknown'] = 'naməlum';
 $labels['newkeypass'] = 'Şifrə';
+?>

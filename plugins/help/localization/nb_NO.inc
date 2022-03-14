@@ -17,5 +17,4 @@
 $labels['help'] = 'Hjelp';
 $labels['about'] = 'Om';
 $labels['license'] = 'Lisensvilkår';
-$labels['csrfinfo'] = 'Les mer om CSRF og hvordan vi beskytter deg';
-$labels['arialabelhelpcontent'] = 'Hjelp innhold';
+?>

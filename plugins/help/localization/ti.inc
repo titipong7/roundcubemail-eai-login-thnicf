@@ -17,3 +17,4 @@
 $labels['help'] = 'መምሃሪ';
 $labels['about'] = 'ብዛዕባ';
 $labels['license'] = 'ፍቓድ';
+?>

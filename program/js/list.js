@@ -38,7 +38,7 @@
  */
 function rcube_list_widget(list, p)
 {
-  // static constants
+  // static contants
   this.ENTER_KEY = 13;
   this.DELETE_KEY = 46;
   this.BACKSPACE_KEY = 8;
@@ -77,7 +77,7 @@ function rcube_list_widget(list, p)
   this.touch_start_time = 0; // start time of the touch event
   this.touch_event_time = 500; // maximum time a touch should be considered a left mouse button event, after this its something else (eg contextmenu event)
 
-  // overwrite default parameters
+  // overwrite default paramaters
   if (p && typeof p === 'object')
     for (var n in p)
       this[n] = p[n];
@@ -167,8 +167,8 @@ init_row: function(row)
           return true;
       });
 
-    // for IE and Edge (Trident) differentiate between touch, touch+hold using pointer events rather than touch
-    if ((bw.ie || (bw.edge && bw.vendver < 75)) && bw.pointer) {
+    // for IE and Edge differentiate between touch, touch+hold using pointer events rather than touch
+    if ((bw.ie || bw.edge) && bw.pointer) {
       $(row).on('pointerdown', function(e) {
           if (e.pointerType == 'touch') {
             self.touch_start_time = new Date().getTime();
@@ -259,18 +259,12 @@ init_header: function()
   }
 },
 
-/**
- * Set the scrollable parent object for the table's fixed header
- */
-container: window,
-
 init_fixed_header: function()
 {
   var clone = $(this.list.tHead).clone();
 
   if (!this.fixed_header) {
     this.fixed_header = $('<table>')
-      .attr('id', this.list.id + '-fixedcopy')
       .attr('class', this.list.className + ' fixedcopy')
       .attr('role', 'presentation')
       .css({ position:'fixed' })
@@ -279,14 +273,14 @@ init_fixed_header: function()
     $(this.list).before(this.fixed_header);
 
     var me = this;
-    $(window).on('resize', function() { me.resize(); });
-    $(this.container).on('scroll', function() {
-        var w = $(this);
-        me.fixed_header.css({
-          marginLeft: -w.scrollLeft() + 'px',
-          marginTop: -w.scrollTop() + 'px'
-        });
+    $(window).resize(function() { me.resize(); });
+    $(window).scroll(function() {
+      var w = $(window);
+      me.fixed_header.css({
+        marginLeft: -w.scrollLeft() + 'px',
+        marginTop: -w.scrollTop() + 'px'
       });
+    });
   }
   else {
     $(this.fixed_header).find('thead').replaceWith(clone);
@@ -460,10 +454,10 @@ update_row: function(id, cols, newid, select)
 /**
  * Add selection checkbox to the list record
  */
-insert_checkbox: function(row, tag_name)
+insert_checkbox: function(row)
 {
   var key, self = this,
-    cell = document.createElement(this.col_tagname(tag_name)),
+    cell = document.createElement(this.col_tagname()),
     chbox = document.createElement('input');
 
   chbox.type = 'checkbox';
@@ -500,26 +494,14 @@ enable_checkbox_selection: function()
   this.checkbox_selection = true;
 
   // Add checkbox to existing records if any
-  var r, len, cell, rows,
-    row_tag = this.row_tagname().toUpperCase();
+  var r, len, cell, row_tag = this.row_tagname().toUpperCase(),
+    rows = this.tbody.childNodes;
 
-  if (this.thead) {
-    rows = this.thead.childNodes;
-    for (r=0, len=rows.length; r<len; r++) {
-      if (rows[r].nodeName == row_tag && (cell = rows[r].firstChild)) {
-        if (cell.className == 'selection')
-          break;
-        this.insert_checkbox(rows[r], 'thead');
-      }
-    }
-  }
-
-  rows = this.tbody.childNodes;
   for (r=0, len=rows.length; r<len; r++) {
     if (rows[r].nodeName == row_tag && (cell = rows[r].firstChild)) {
       if (cell.className == 'selection')
         break;
-      this.insert_checkbox(rows[r], 'tbody');
+      this.insert_checkbox(rows[r]);
     }
   }
 },
@@ -1032,10 +1014,10 @@ row_tagname: function()
   return row_tagnames[this.tagname] || row_tagnames['*'];
 },
 
-col_tagname: function(tagname)
+col_tagname: function()
 {
-  var col_tagnames = { table:'td', thead:'th', tbody:'td', '*':'span' };
-  return col_tagnames[tagname || this.tagname] || col_tagnames['*'];
+  var col_tagnames = { table:'td', '*':'span' };
+  return col_tagnames[this.tagname] || col_tagnames['*'];
 },
 
 get_cell: function(row, index)
@@ -1168,7 +1150,7 @@ select_last: function(mod_key, noscroll)
 
 
 /**
- * Add all children of the given row to selection
+ * Add all childs of the given row to selection
  */
 select_children: function(uid)
 {
@@ -1421,7 +1403,7 @@ highlight_row: function(id, multiple, norecur)
 
 
 /**
- * Highlight/unhighlight all children of the given row
+ * Highlight/unhighlight all childs of the given row
  */
 highlight_children: function(id, status)
 {
@@ -1650,17 +1632,6 @@ drag_mouse_move: function(e)
         return false;
     });
 
-    var row, subject,
-      subject_col = self.subject_column(),
-      subject_func = function(cell) {
-        if (cell) {
-          // remove elements marked with "skip-on-drag" class
-          cell = $(cell).clone();
-          $(cell).find('.skip-on-drag').remove();
-        }
-        return cell ? cell.text() : '';
-      };
-
     // append subject (of every row up to the limit) to the drag layer
     $.each(selection, function(i, uid) {
       if (i > limit) {
@@ -1668,30 +1639,27 @@ drag_mouse_move: function(e)
         return false;
       }
 
-      row = self.rows[uid].obj;
-      subject = '';
+      var subject_col = self.subject_column();
 
-      $(row).children(self.col_tagname()).each(function(n, cell) {
+      $('> ' + self.col_tagname(), self.rows[uid].obj).each(function(n, cell) {
         if (subject_col < 0 || (subject_col >= 0 && subject_col == n)) {
-          if (subject = subject_func(cell)) {
+          // remove elements marked with "skip-on-drag" class
+          cell = $(cell).clone();
+          $(cell).find('.skip-on-drag').remove();
+
+          var subject = cell.text();
+
+          if (subject) {
+            // remove leading spaces
+            subject = $.trim(subject);
+            // truncate line to 50 characters
+            subject = (subject.length > 50 ? subject.substring(0, 50) + '...' : subject);
+
+            self.draglayer.append($('<div>').text(subject));
             return false;
           }
         }
       });
-
-      // Subject column might be wrong, fallback to .subject
-      if (!subject.length) {
-        subject = subject_func($(row).children('.subject').first());
-      }
-
-      if (subject.length) {
-        // remove leading spaces
-        subject = subject.trim();
-        // truncate line to 50 characters
-        subject = (subject.length > 50 ? subject.substring(0, 50) + '...' : subject);
-
-        self.draglayer.append($('<div>').text(subject));
-      }
     });
 
     this.draglayer.show();

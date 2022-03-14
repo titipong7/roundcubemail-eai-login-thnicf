@@ -26,9 +26,10 @@
  */
 class rcube_spellchecker_googie extends rcube_spellchecker_engine
 {
-    const GOOGIE_HOST = 'https://spell.roundcube.net';
+    const GOOGIE_HOST = 'ssl://spell.roundcube.net';
+    const GOOGIE_PORT = 443;
 
-    private $matches = [];
+    private $matches = array();
     private $content;
 
     /**
@@ -38,14 +39,12 @@ class rcube_spellchecker_googie extends rcube_spellchecker_engine
      */
     function languages()
     {
-        return [
-            'am','ar','ar','bg','br','ca','cs','cy','da',
+        return array('am','ar','ar','bg','br','ca','cs','cy','da',
             'de_CH','de_DE','el','en_GB','en_US',
             'eo','es','et','eu','fa','fi','fr_FR','ga','gl','gl',
             'he','hr','hu','hy','is','it','ku','lt','lv','nl',
             'pl','pt_BR','pt_PT','ro','ru',
-            'sk','sl','sv','uk'
-        ];
+            'sk','sl','sv','uk');
     }
 
     /**
@@ -57,70 +56,78 @@ class rcube_spellchecker_googie extends rcube_spellchecker_engine
     {
         $this->content = $text;
 
-        $matches = [];
-
         if (empty($text)) {
-            return $this->matches = $matches;
+            return $this->matches = array();
         }
-
-        $rcube  = rcube::get_instance();
-        $client = $rcube->get_http_client();
 
         // spell check uri is configured
-        $url = $rcube->config->get('spellcheck_uri');
+        $url = rcube::get_instance()->config->get('spellcheck_uri');
 
-        if (!$url) {
-            $url = self::GOOGIE_HOST . '/tbproxy/spell?lang=';
+        if ($url) {
+            $a_uri = parse_url($url);
+            $ssl   = ($a_uri['scheme'] == 'https' || $a_uri['scheme'] == 'ssl');
+            $port  = $a_uri['port'] ? $a_uri['port'] : ($ssl ? 443 : 80);
+            $host  = ($ssl ? 'ssl://' : '') . $a_uri['host'];
+            $path  = $a_uri['path'] . ($a_uri['query'] ? '?'.$a_uri['query'] : '') . $this->lang;
         }
-        $url .= $this->lang;
-        $url .= sprintf('&key=%06d', !empty($_SESSION['user_id']) ? $_SESSION['user_id'] : 0);
+        else {
+            $host = self::GOOGIE_HOST;
+            $port = self::GOOGIE_PORT;
+            $path = '/tbproxy/spell?lang=' . $this->lang;
+        }
+
+        $path .= sprintf('&key=%06d', $_SESSION['user_id']);
 
         $gtext = '<?xml version="1.0" encoding="utf-8" ?>'
             .'<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="1">'
             .'<text>' . htmlspecialchars($text, ENT_QUOTES, RCUBE_CHARSET) . '</text>'
             .'</spellrequest>';
 
-        try {
-            $response = $client->post($url, [
-                    'connect_timeout' => 5, // seconds
-                    'headers' => [
-                        'User-Agent' => "Roundcube Webmail/" . RCUBE_VERSION . " (Googiespell Wrapper)",
-                            'Content-type' => 'text/xml'
-                    ],
-                    'body' => $gtext
-                ]
-            );
-        }
-        catch (Exception $e) {
-            // Do nothing, the error set below should be logged by the caller
+        $store = '';
+        if ($fp = fsockopen($host, $port, $errno, $errstr, 30)) {
+            $out = "POST $path HTTP/1.0\r\n";
+            $out .= "Host: " . str_replace('ssl://', '', $host) . "\r\n";
+            $out .= "User-Agent: Roundcube Webmail/" . RCUBE_VERSION . " (Googiespell Wrapper)\r\n";
+            $out .= "Content-Length: " . strlen($gtext) . "\r\n";
+            $out .= "Content-Type: text/xml\r\n";
+            $out .= "Connection: Close\r\n\r\n";
+            $out .= $gtext;
+            fwrite($fp, $out);
+
+            while (!feof($fp))
+                $store .= fgets($fp, 128);
+            fclose($fp);
         }
 
-        if (empty($response)) {
-            $this->error = $e ? $e->getMessage() : "Spelling engine failure";
-        }
-        else if ($response->getStatusCode() != 200) {
-            $this->error = 'HTTP ' . $response->getReasonPhrase();
-        }
-        else {
-            $response_body = $response->getBody();
-            if (preg_match('/<spellresult error="([^"]+)"/', $response_body, $m) && $m[1]) {
-                $this->error = "Error code $m[1] returned";
-                $this->error .= preg_match('/<errortext>([^<]+)/', $response_body, $m) ? ": " . html_entity_decode($m[1]) : '';
-            }
-
-            preg_match_all('/<c o="([^"]*)" l="([^"]*)" s="([^"]*)">([^<]*)<\/c>/', $response_body, $matches, PREG_SET_ORDER);
-
-            // skip exceptions (if appropriate options are enabled)
-            foreach ($matches as $idx => $m) {
-                $word = mb_substr($text, $m[1], $m[2], RCUBE_CHARSET);
-                // skip  exceptions
-                if ($this->dictionary->is_exception($word)) {
-                    unset($matches[$idx]);
-                }
+        // parse HTTP response
+        if (preg_match('!^HTTP/1.\d (\d+)(.+)!', $store, $m)) {
+            $http_status = $m[1];
+            if ($http_status != '200') {
+                $this->error = 'HTTP ' . $m[1] . rtrim($m[2]);
             }
         }
 
-        return $this->matches = $matches;
+        if (!$store) {
+            $this->error = "Empty result from spelling engine";
+        }
+        else if (preg_match('/<spellresult error="([^"]+)"/', $store, $m) && $m[1]) {
+            $this->error = "Error code $m[1] returned";
+            $this->error .= preg_match('/<errortext>([^<]+)/', $store, $m) ? ": " . html_entity_decode($m[1]) : '';
+        }
+
+        preg_match_all('/<c o="([^"]*)" l="([^"]*)" s="([^"]*)">([^<]*)<\/c>/', $store, $matches, PREG_SET_ORDER);
+
+        // skip exceptions (if appropriate options are enabled)
+        foreach ($matches as $idx => $m) {
+            $word = mb_substr($text, $m[1], $m[2], RCUBE_CHARSET);
+            // skip  exceptions
+            if ($this->dictionary->is_exception($word)) {
+                unset($matches[$idx]);
+            }
+        }
+
+        $this->matches = $matches;
+        return $matches;
     }
 
     /**
@@ -132,7 +139,7 @@ class rcube_spellchecker_googie extends rcube_spellchecker_engine
     {
         $matches = $word ? $this->check($word) : $this->matches;
 
-        if (!empty($matches[0][4])) {
+        if ($matches[0][4]) {
             $suggestions = explode("\t", $matches[0][4]);
             if (count($suggestions) > self::MAX_SUGGESTIONS) {
                 $suggestions = array_slice($suggestions, 0, self::MAX_SUGGESTIONS);
@@ -141,7 +148,7 @@ class rcube_spellchecker_googie extends rcube_spellchecker_engine
             return $suggestions;
         }
 
-        return [];
+        return array();
     }
 
     /**
@@ -159,7 +166,7 @@ class rcube_spellchecker_googie extends rcube_spellchecker_engine
             $text    = $this->content;
         }
 
-        $result = [];
+        $result = array();
 
         foreach ($matches as $m) {
             $result[] = mb_substr($text, $m[1], $m[2], RCUBE_CHARSET);

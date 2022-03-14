@@ -20,5 +20,3 @@ $labels['attachvcard'] = 'Bashkëngjitni vCard';
 $labels['vcardattached'] = 'Kartela vCard u bashkëngjit.';
 $labels['vcard'] = 'vCard';
 $labels['forwardvcard'] = 'Përcille vCard-in';
-$labels['contactsattached'] = 'Ka $num kontakte bashkëngjitur këtij mesazhi.';
-$labels['importedsuccessfully'] = 'Kontakti(ets) u importua me sukses te libri i adresave.';

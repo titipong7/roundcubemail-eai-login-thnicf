@@ -7,7 +7,7 @@
  * and should only contain mappings which cannot be detected properly from the file contents.
  */
 
-return [
+return array(
   'xls' => 'application/vnd.ms-excel',
   'xlm' => 'application/vnd.ms-excel',
   'xla' => 'application/vnd.ms-excel',
@@ -53,4 +53,6 @@ return [
   's7z' => 'application/x-7z-compressed',
   'vcf' => 'text/vcard',
   'ics' => 'text/calendar',
-];
+);
+
+?>

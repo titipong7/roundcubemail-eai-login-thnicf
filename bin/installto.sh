@@ -29,21 +29,18 @@ if (!function_exists('system')) {
 $target_dir = unslashify(end($_SERVER['argv']));
 $accept = in_array('-y', $_SERVER['argv']) ? 'y' : null;
 
-if (empty($target_dir) || !is_dir(realpath($target_dir))) {
+if (empty($target_dir) || !is_dir(realpath($target_dir)))
     rcube::raise_error("Invalid target: not a directory\nUsage: installto.sh [-y] <TARGET>", false, true);
-}
 
 // read version from iniset.php
 $iniset = @file_get_contents($target_dir . '/program/include/iniset.php');
-if (!preg_match('/define\(.RCMAIL_VERSION.,\s*.([0-9.]+[a-z0-9-]*)/', $iniset, $m)) {
+if (!preg_match('/define\(.RCMAIL_VERSION.,\s*.([0-9.]+[a-z0-9-]*)/', $iniset, $m))
     rcube::raise_error("No valid Roundcube installation found at $target_dir", false, true);
-}
 
 $oldversion = $m[1];
 
-if (version_compare(version_parse($oldversion), version_parse(RCMAIL_VERSION), '>')) {
+if (version_compare(version_parse($oldversion), version_parse(RCMAIL_VERSION), '>'))
     rcube::raise_error("Target installation already in version $oldversion.", false, true);
-}
 
 if (version_compare(version_parse($oldversion), version_parse(RCMAIL_VERSION), '==')) {
     echo "Target installation already in version $oldversion. Do you want to update again? (y/N)\n";
@@ -57,8 +54,8 @@ $input = $accept ?: trim(fgets(STDIN));
 if (strtolower($input) == 'y') {
     echo "Copying files to target location...";
 
-    $adds = [];
-    $dirs = ['bin','SQL','plugins','skins','program'];
+    $adds = array();
+    $dirs = array('bin','SQL','plugins','skins','program');
 
     if (is_dir(INSTALL_PATH . 'vendor') && !is_file("$target_dir/composer.json")) {
         $dirs[] = 'vendor';
@@ -69,7 +66,7 @@ if (strtolower($input) == 'y') {
 
     foreach ($dirs as $dir) {
         // @FIXME: should we use --delete for all directories?
-        $delete  = in_array($dir, ['program', 'vendor', 'installer']) ? '--delete ' : '';
+        $delete  = in_array($dir, array('program', 'vendor', 'installer')) ? '--delete ' : '';
         $command = "rsync -aC --out-format=%n " . $delete . INSTALL_PATH . "$dir/ $target_dir/$dir/";
 
         if (system($command, $ret) === false || $ret > 0) {
@@ -77,7 +74,7 @@ if (strtolower($input) == 'y') {
         }
     }
 
-    foreach (['index.php','config/defaults.inc.php','composer.json-dist','jsdeps.json','CHANGELOG.md','README.md','UPGRADING','LICENSE','INSTALL'] as $file) {
+    foreach (array('index.php','config/defaults.inc.php','composer.json-dist','jsdeps.json','CHANGELOG','README.md','UPGRADING','LICENSE','INSTALL') as $file) {
         $command = "rsync -a --out-format=%n " . INSTALL_PATH . "$file $target_dir/$file";
 
         if (file_exists(INSTALL_PATH . $file) && (system($command, $ret) === false || $ret > 0)) {
@@ -86,7 +83,7 @@ if (strtolower($input) == 'y') {
     }
 
     // Copy .htaccess or .user.ini if needed
-    foreach (['.htaccess','.user.ini'] as $file) {
+    foreach (array('.htaccess','.user.ini') as $file) {
         if (file_exists(INSTALL_PATH . $file)) {
             if (!file_exists("$target_dir/$file") || file_get_contents(INSTALL_PATH . $file) != file_get_contents("$target_dir/$file")) {
                 if (copy(INSTALL_PATH . $file, "$target_dir/$file.new")) {
@@ -116,7 +113,7 @@ if (strtolower($input) == 'y') {
     // Warn about situation when using "complete" package to update "custom" installation (#7087)
     // Note: "Complete" package do not include jsdeps.json nor install-jsdeps.sh
     if (file_exists("$target_dir/jsdeps.json") && !file_exists(INSTALL_PATH . "jsdeps.json")) {
-        $adds[] = "WARNING: JavaScript dependencies update skipped. New jsdeps.json file not found.";
+        $adds[] = "WARNING: JavaScript dependencies update skipped.";
     }
     // check if js-deps are up-to-date
     else if (file_exists("$target_dir/jsdeps.json") && file_exists("$target_dir/bin/install-jsdeps.sh")) {
@@ -129,6 +126,9 @@ if (strtolower($input) == 'y') {
             system("cd $target_dir && bin/install-jsdeps.sh");
             echo "done.\n\n";
         }
+    }
+    else {
+        $adds[] = "NOTICE: JavaScript dependencies installation skipped.";
     }
 
     if (file_exists("$target_dir/installer")) {

@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Prikaži emotikone u tekstualnim porukama';
 $labels['emoticonscompose'] = 'Omogući emotikone';
+?>

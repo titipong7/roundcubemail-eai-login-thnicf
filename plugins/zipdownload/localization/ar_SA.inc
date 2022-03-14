@@ -15,8 +15,3 @@
 */
 
 $labels['downloadall'] = 'تحميل جميع المرفقات';
-$labels['download'] = 'تحميل...';
-$labels['downloadmbox'] = 'تنسيق Mbox (.zip)';
-$labels['downloadmaildir'] = 'تنسيق Maildir (.zip)';
-$labels['downloademl'] = 'المصدر (.eml)';
-$labels['sizelimiterror'] = 'إجمالي حجم الرسائل المحددة يتجاوز الحد ($size)';

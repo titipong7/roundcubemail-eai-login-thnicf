@@ -19,6 +19,3 @@ $labels['vcardsavefailed'] = 'Nevarēja saglabāt vizītkarti';
 $labels['attachvcard'] = 'Pievienot vCard';
 $labels['vcardattached'] = 'vCard fails pievienots.';
 $labels['vcard'] = 'vCard';
-$labels['forwardvcard'] = 'Pārsūtīt vCard';
-$labels['contactsattached'] = 'Šim ziņojumam ir pievienoti $num kontakti.';
-$labels['importedsuccessfully'] = 'Kontakti veiksmīgi ieimportēti adrešu grāmatā.';

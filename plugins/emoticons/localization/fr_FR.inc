@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Afficher les frimousses dans les messages texte en clair';
 $labels['emoticonscompose'] = 'Activer les frimousses';
+?>

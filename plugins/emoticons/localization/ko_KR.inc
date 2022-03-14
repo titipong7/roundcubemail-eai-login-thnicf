@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = '일반 텍스트 메시지에서 이모티콘 표시';
 $labels['emoticonscompose'] = '이모티콘 활성화';
+?>

@@ -18,4 +18,3 @@ $labels['userinfo'] = 'Informații utilizator';
 $labels['created'] = 'Data creării';
 $labels['lastlogin'] = 'Ultima autentificare';
 $labels['defaultidentity'] = 'Identitate principală';
-$labels['userid'] = 'ID';

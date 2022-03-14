@@ -27,3 +27,4 @@ $labels['archivetypemonth'] = 'ماه (به عنوان مثال بایگانی/�
 $labels['archivetypefolder'] = 'پوشه اصلی';
 $labels['archivetypesender'] = 'رایانامه فرستنده';
 $labels['unkownsender'] = 'ناشناخته';
+?>

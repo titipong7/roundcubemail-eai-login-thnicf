@@ -128,8 +128,9 @@ if ($RCMAIL->task == 'login' && $RCMAIL->action == 'login') {
           $row = $result->fetch_row();
           $auth['user'] = $row['0'];
       }
+      return $auth['user'];
     }
-    map_users($auth);
+    $auth['user'] = map_users($auth);
 
     // Login
     if ($auth['valid'] && !$auth['abort']

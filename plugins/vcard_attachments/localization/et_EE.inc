@@ -16,6 +16,4 @@
 
 $labels['addvcardmsg'] = 'Lisa vCard aadressiraamatusse';
 $labels['vcardsavefailed'] = 'vCard salvestamine nurjus';
-$labels['vcardattached'] = 'vCard fail on lisatud.';
 $labels['vcard'] = 'vCard';
-$labels['forwardvcard'] = 'Edasta vCard';

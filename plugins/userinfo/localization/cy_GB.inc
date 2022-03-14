@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Gwybodaeth defnyddiwr';
-$labels['infoforuser'] = 'Gwybodaeth ar gyfer $user';
 $labels['created'] = 'Crëwyd';
 $labels['lastlogin'] = 'Mewngofnodiad diwethaf';
 $labels['defaultidentity'] = 'Personoliaeth arferol';
-$labels['userid'] = 'ID';

@@ -23,3 +23,4 @@ $labels['shortacld'] = 'Verwijderen';
 $labels['shortaclt'] = 'Verwijderen';
 $labels['shortaclother'] = 'Anders';
 $labels['shortacldelete'] = 'Verwijderen';
+?>

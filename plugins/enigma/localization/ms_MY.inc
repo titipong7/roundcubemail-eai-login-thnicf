@@ -17,3 +17,4 @@
 $labels['expiresnever'] = 'tidak pernah';
 $labels['unknown'] = 'tidak diketahui';
 $labels['newkeypass'] = 'Katalaluan';
+?>

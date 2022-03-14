@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Mostra les emoticones en els missatge en text net';
 $labels['emoticonscompose'] = 'Activa les emoticones';
+?>

@@ -20,3 +20,4 @@ $labels['expiresnever'] = 'qet';
 $labels['unknown'] = 'nenas';
 $labels['keychpass'] = 'Şîfreyê biguherîne';
 $labels['newkeypass'] = 'Nasnav';
+?>

@@ -26,3 +26,4 @@ $labels['shortaclt'] = 'මකන්න';
 $labels['shortaclother'] = 'වෙනත්';
 $labels['shortaclread'] = 'කියවන්න';
 $labels['shortacldelete'] = 'මකන්න';
+?>

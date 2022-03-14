@@ -20,3 +20,4 @@ $labels['expiresnever'] = 'nunca';
 $labels['unknown'] = 'descoñecido';
 $labels['keychpass'] = 'Cambiar contrasinal';
 $labels['newkeypass'] = 'Contrasinal';
+?>

@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Hangulatjelek megjelenítése sima szöveges üzenetekben';
 $labels['emoticonscompose'] = 'Hangulatjelek engedélyezése';
+?>

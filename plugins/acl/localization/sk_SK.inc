@@ -95,3 +95,4 @@ $messages['createerror'] = 'Prístupové oprávnenia sa nepodarilo pridať';
 $messages['deleteconfirm'] = 'Naozaj chcete odstrániť prístupové oprávnenia vybraného používateľa?';
 $messages['norights'] = 'Neboli určené žiadne oprávnenia!';
 $messages['nouser'] = 'Nebolo určené žiadne meno používateľa!';
+?>

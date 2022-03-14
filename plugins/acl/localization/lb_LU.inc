@@ -73,3 +73,4 @@ $messages['createerror'] = 'Zougrëffsrechter kënnen net dobäigesat ginn';
 $messages['deleteconfirm'] = 'Bass du dir sécher, dass du d\'Zougrëffsrechter fir déi ausgewielte Benotzer wëlls ewechhuelen?';
 $messages['norights'] = 'Et goufe keng Rechter uginn! ';
 $messages['nouser'] = 'Et gouf kee Benotzernumm uginn!';
+?>

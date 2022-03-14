@@ -33,7 +33,6 @@
     border-radius: .3rem;
     z-index: 240;
     position: absolute;
-    scrollbar-width: @scrollbar-width;
 
    .ui-state-active {
         border: 0 !important;
@@ -109,7 +108,7 @@
 
             a.btn-link,
             button {
-                .overflow-ellipsis();
+                .overflow-ellipsis;
                 min-width: 5rem;
                 margin: floor(.65 * @page-font-size) floor(.3 * @page-font-size);
 
@@ -334,8 +333,6 @@
     .ui-datepicker-next {
         cursor: pointer;
         width: auto;
-        color: @color-font;
-        text-decoration: none;
 
         &:before {
         &:extend(.font-icon-class);

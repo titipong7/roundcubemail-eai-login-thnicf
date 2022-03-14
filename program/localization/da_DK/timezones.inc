@@ -17,7 +17,6 @@
 $labels['tz:america'] = 'Amerika';
 $labels['tz:antarctica'] = 'Antarktis';
 $labels['tz:asia'] = 'Asien';
-$labels['tz:asia:bangkok'] = 'Bangkok';
 $labels['tz:europe'] = 'Europa';
 $labels['tz:europe:athens'] = 'Athen';
 $labels['tz:europe:belgrade'] = 'Belgien';

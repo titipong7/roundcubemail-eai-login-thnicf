@@ -19,3 +19,4 @@ $labels['subkeycreated'] = 'Được tạo';
 $labels['expiresnever'] = 'không bao giờ';
 $labels['unknown'] = 'Không rõ';
 $labels['newkeypass'] = 'Mật khẩu';
+?>

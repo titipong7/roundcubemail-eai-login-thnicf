@@ -18,4 +18,3 @@ $labels['userinfo'] = 'Titouroù an arveriad';
 $labels['created'] = 'Krouet';
 $labels['lastlogin'] = 'Kennask diwezhañ';
 $labels['defaultidentity'] = 'Identelezh dre ziouer';
-$labels['userid'] = 'Naoudi';

@@ -27,7 +27,7 @@
 class rcube_spellchecker_pspell extends rcube_spellchecker_engine
 {
     private $plink;
-    private $matches = [];
+    private $matches = array();
 
     /**
      * Return a list of languages supported by this backend
@@ -36,20 +36,19 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
      */
     function languages()
     {
-        $defaults = ['en'];
-        $langs    = [];
+        $defaults = array('en');
+        $langs    = array();
 
         // get aspell dictionaries
         exec('aspell dump dicts', $dicts);
         if (!empty($dicts)) {
-            $seen = [];
+            $seen = array();
             foreach ($dicts as $lang) {
                 $lang  = preg_replace('/-.*$/', '', $lang);
                 $langc = strlen($lang) == 2 ? $lang.'_'.strtoupper($lang) : $lang;
 
-                if (empty($seen[$langc])) {
+                if (!$seen[$langc]++) {
                     $langs[] = $lang;
-                    $seen[$langc] = true;
                 }
             }
 
@@ -73,7 +72,7 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
                 return;
             }
 
-            $this->plink = pspell_new($this->lang, '', '', RCUBE_CHARSET, PSPELL_FAST);
+            $this->plink = pspell_new($this->lang, null, null, RCUBE_CHARSET, PSPELL_FAST);
         }
 
         if (!$this->plink) {
@@ -91,22 +90,22 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
         $this->init();
 
         if (!$this->plink) {
-            return [];
+            return array();
         }
 
         // tokenize
-        $text = preg_split($this->separator, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+        $text = preg_split($this->separator, $text, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 
         $diff    = 0;
-        $matches = [];
+        $matches = array();
 
         foreach ($text as $w) {
             $word = trim($w[0]);
             $pos  = $w[1] - $diff;
             $len  = mb_strlen($word);
 
+            // skip exceptions
             if ($this->dictionary->is_exception($word)) {
-                // skip exceptions
             }
             else if (!pspell_check($this->plink, $word)) {
                 $suggestions = pspell_suggest($this->plink, $word);
@@ -115,13 +114,14 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
                     $suggestions = array_slice($suggestions, 0, self::MAX_SUGGESTIONS);
                 }
 
-                $matches[] = [$word, $pos, $len, null, $suggestions];
+                $matches[] = array($word, $pos, $len, null, $suggestions);
             }
 
             $diff += (strlen($word) - $len);
         }
 
-        return $this->matches = $matches;
+        $this->matches = $matches;
+        return $matches;
     }
 
     /**
@@ -134,7 +134,7 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
         $this->init();
 
         if (!$this->plink) {
-            return [];
+            return array();
         }
 
         $suggestions = pspell_suggest($this->plink, $word);
@@ -143,7 +143,7 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
             $suggestions = array_slice($suggestions, 0, self::MAX_SUGGESTIONS);
         }
 
-        return $suggestions ?: [];
+        return is_array($suggestions) ? $suggestions : array();
     }
 
     /**
@@ -153,18 +153,18 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
      */
     function get_words($text = null)
     {
-        $result = [];
+        $result = array();
 
         if ($text) {
             // init spellchecker
             $this->init();
 
             if (!$this->plink) {
-                return [];
+                return array();
             }
 
             // With PSpell we don't need to get suggestions to return misspelled words
-            $text = preg_split($this->separator, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+            $text = preg_split($this->separator, $text, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 
             foreach ($text as $w) {
                 $word = trim($w[0]);

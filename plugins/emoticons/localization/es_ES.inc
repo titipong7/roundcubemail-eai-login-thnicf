@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Mostrar emoticonos en mensajes de texto simple';
 $labels['emoticonscompose'] = 'Activar emoticonos';
+?>

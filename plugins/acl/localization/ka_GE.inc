@@ -26,3 +26,4 @@ $labels['shortaclt'] = 'წაშლა';
 $labels['shortaclother'] = 'სხვა';
 $labels['shortaclread'] = 'წაკითხვა';
 $labels['shortacldelete'] = 'წაშლა';
+?>

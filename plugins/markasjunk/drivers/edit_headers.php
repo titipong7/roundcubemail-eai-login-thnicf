@@ -41,12 +41,11 @@ class markasjunk_edit_headers
         $rcube = rcube::get_instance();
         $args  = $rcube->config->get($spam ? 'markasjunk_spam_patterns' : 'markasjunk_ham_patterns');
 
-        if (empty($args['patterns'])) {
+        if (count($args['patterns']) == 0) {
             return;
         }
 
-        $new_uids = [];
-
+        $new_uids = array();
         foreach ($uids as $uid) {
             $raw_message = $rcube->storage->get_raw_body($uid);
             $raw_headers = $rcube->storage->get_raw_headers($uid);
@@ -57,7 +56,7 @@ class markasjunk_edit_headers
             $saved = $rcube->storage->save_message($dst_mbox, $raw_message);
 
             if ($saved !== false) {
-                $rcube->output->command('markasjunk_move', null, [$uid]);
+                $rcube->output->command('markasjunk_move', null, array($uid));
                 array_push($new_uids, $saved);
             }
         }

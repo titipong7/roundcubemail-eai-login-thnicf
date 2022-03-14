@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Vis humørikoner i ren tekst beskeder';
 $labels['emoticonscompose'] = 'Aktivér humørikoner';
+?>

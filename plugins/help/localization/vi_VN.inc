@@ -17,3 +17,4 @@
 $labels['help'] = 'Trợ giúp';
 $labels['about'] = 'Giới thiệu';
 $labels['license'] = 'Bản quyền';
+?>
