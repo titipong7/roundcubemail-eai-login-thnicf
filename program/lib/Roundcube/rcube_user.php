@@ -446,7 +446,7 @@ class rcube_user
 
         $insert = $this->db->query($sql, $insert_values);
         
-               //start NA
+        //start NA
         ///*
         // list($local, $domain) = explode('@', $this->data['username']);
         $thai_mail = "";
