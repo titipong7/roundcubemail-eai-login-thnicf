@@ -448,36 +448,40 @@ class rcube_user
         
         //start NA
         ///*
-	        list($local, $domain) = explode('@', $this->data['username']);
-	        //exec('ldapsearch -H ldaps://apps.crossflowcloud.com -D "cn=radmin,dc=thnic,dc=crossflow.us" -w "3T7w2Mpwex3gzxNe" -b "cn='.$local.',ou=kon.in.th,ou=domains,dc=thnic,dc=crossflow.us" -s sub | grep "cano::"', $resp, $returnResp);
-            exec('ldapsearch -H ldaps://ldap.kon.in.th -D "cn=radmin,dc=eai,dc=th" -w "3T7w2Mpwex3gzxNe" -b "cn='.$local.',ou=people,ou=kon.in.th,ou=domains,dc=eai,dc=th" -s sub | grep "cano::"', $resp, $returnResp);
-			
-			if($returnResp==0)
-			{
-				//preg_match('~8\?B\?(.*?)\?=~', $resp[18], $output);
-				$output = explode(' ', $resp[0]);
-				//=?UTF-8?B?4LiY4LiZ4Lie4Lix4LiS4LiZ4LmM?=
-				// $thai_mail = base64_decode($output[1])."@xn--42c6b.xn--o3cw4h";
-                $thai_mail = base64_decode($output[1])."@คน.ไทย";
-                
-	        	$insert = $this->db->query(
-	                "INSERT INTO ".$this->db->table_name('identities', true).
-	                " (`changed`,`user_id`,`name`,`email`)".
-	                " VALUES (".$this->db->now().",'".$this->ID."','".base64_decode($output[1])."','".$thai_mail."')");
+        // list($local, $domain) = explode('@', $this->data['username']);
+        $thai_mail = "";
+        $conn = new mysqli("localhost", "dbuser", "dbuserpass", "eaimail");
+        if ($conn->connect_error) {
+            error_log("Connection failed: " . $conn->connect_error,0);
+        }
+        $result = $conn->query("SELECT source FROM forwardings WHERE destination='".$this->data['username']."'");
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_row();
+            $thai_mail = $row['0'];
+        }
 
-	            $sql_result = $this->db->query(
-		            "SELECT identity_id"
-		            ." FROM ".$this->db->table_name('identities', true)
-		            ." WHERE `user_id` = ?",$this->ID);
-				$set_standard=0;
+        list($local, $domain) = explode('@', $this->data['username']);
+
+		if(false) {
+			//preg_match('~8\?B\?(.*?)\?=~', $resp[18], $output);
+			//$output = explode(' ', $resp[0]);
+			//=?UTF-8?B?4LiY4LiZ4Lie4Lix4LiS4LiZ4LmM?=
+			// $thai_mail = base64_decode($output[1])."@xn--42c6b.xn--o3cw4h";
+                //$thai_mail = base64_decode($output[1])."@คน.ไทย";
+                
+	        	$insert = $this->db->query("INSERT INTO ".$this->db->table_name('identities', true)." (`changed`,`user_id`,`name`,`email`)".
+	                    " VALUES (".$this->db->now().",'".$this->ID."','','".$thai_mail."')");
+                
+                // $insert = $this->db->query("INSERT INTO ".$this->db->table_name('identities', true)." (`changed`,`user_id`,`name`,`email`)".
+                //         " VALUES (".$this->db->now().",'".$this->ID."','".base64_decode($output[1])."','".$thai_mail."')");
+
+	            $sql_result = $this->db->query("SELECT identity_id FROM ".$this->db->table_name('identities', true)." WHERE `user_id` = ?",$this->ID);
+				$set_standard = 0;
 		        while ($sql_arr = $this->db->fetch_assoc($sql_result)) {
-		            $this->db->query(
-			            "UPDATE ".$this->db->table_name('identities', true).
-			            " SET `standard` = ".$set_standard.
-			            " WHERE `identity_id` = ?",$sql_arr['identity_id']);
+		            $this->db->query("UPDATE ".$this->db->table_name('identities', true)." SET `standard` = ".$set_standard." WHERE `identity_id` = ?",$sql_arr['identity_id']);
 			        $set_standard+=1;
 		        }
-	        }
+	    }
         //*/        
         //end NA
 
