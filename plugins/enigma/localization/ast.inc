@@ -19,3 +19,4 @@ $labels['subkeycreated'] = 'Creáu';
 $labels['expiresnever'] = 'nunca';
 $labels['unknown'] = 'desconocíu';
 $labels['newkeypass'] = 'Contraseña';
+?>

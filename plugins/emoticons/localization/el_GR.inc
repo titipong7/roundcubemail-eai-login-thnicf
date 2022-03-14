@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Εμφάνιση emoticons σε μηνύματα απλού κειμένου ';
 $labels['emoticonscompose'] = 'Ενεργοποίηση emoticons';
+?>

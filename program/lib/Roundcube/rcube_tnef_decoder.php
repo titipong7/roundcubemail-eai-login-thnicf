@@ -123,21 +123,18 @@ class rcube_tnef_decoder
     const RTF_UNCOMPRESSED = 0x414c454d;
     const RTF_COMPRESSED   = 0x75465a4c;
 
-    protected $codepage;
-
 
     /**
      * Decompress the data.
      *
-     * @param string $data    The data to decompress.
-     * @param bool   $as_html Return message body as HTML
+     * @param string $data The data to decompress.
      *
      * @return array The decompressed data.
      */
-    public function decompress($data, $as_html = false)
+    public function decompress($data)
     {
-        $attachments = [];
-        $message     = [];
+        $attachments = array();
+        $message     = array();
 
         if ($this->_geti($data, 32) == self::SIGNATURE) {
             $this->_geti($data, 16);
@@ -161,42 +158,10 @@ class rcube_tnef_decoder
             }
         }
 
-        // Return the message body as HTML
-        if ($message && $as_html) {
-            // HTML body
-            if (!empty($message['size']) && $message['subtype'] == 'html') {
-                $message = $message['stream'];
-            }
-            // RTF body (converted to HTML)
-            // Note: RTF can contain encapsulated HTML content
-            else if (!empty($message['size']) && $message['subtype'] == 'rtf'
-                && function_exists('iconv')
-                && class_exists('RtfHtmlPhp\Document')
-            ) {
-                try {
-                    $document  = new RtfHtmlPhp\Document($message['stream']);
-                    $formatter = new RtfHtmlPhp\Html\HtmlFormatter(RCUBE_CHARSET);
-                    $message   = $formatter->format($document);
-                }
-                catch (Exception $e) {
-                    // ignore the body
-                    rcube::raise_error([
-                            'file' => __FILE__,
-                            'line' => __LINE__,
-                            'message' => "Failed to extract RTF/HTML content from TNEF attachment"
-                        ], true, false
-                    );
-                }
-            }
-            else {
-                $message = null;
-            }
-        }
-
-        return [
+        return array(
             'message'     => $message,
             'attachments' => array_reverse($attachments),
-        ];
+        );
     }
 
     /**
@@ -371,7 +336,7 @@ class rcube_tnef_decoder
             case self::MAPI_RTF_COMPRESSED:
                 $result['type']    = 'application';
                 $result['subtype'] = 'rtf';
-                $result['name']    = (!empty($result['name']) ? $result['name'] : 'Untitled') . '.rtf';
+                $result['name']    = ($result['name'] ?: 'Untitled') . '.rtf';
                 $result['stream']  = $this->_decodeRTF($value);
                 $result['size']    = strlen($result['stream']);
                 break;
@@ -380,8 +345,7 @@ class rcube_tnef_decoder
             case self::MAPI_BODY_HTML:
                 $result['type']    = 'text';
                 $result['subtype'] = $attr_name == self::MAPI_BODY ? 'plain' : 'html';
-                $result['name']    = (!empty($result['name']) ? $result['name'] : 'Untitled')
-                    . ($attr_name == self::MAPI_BODY ? '.txt' : '.html');
+                $result['name']    = ($result['name'] ?: 'Untitled') . ($attr_name == self::MAPI_BODY ? '.txt' : '.html');
                 $result['stream']  = $value;
                 $result['size']    = strlen($value);
                 break;
@@ -393,13 +357,9 @@ class rcube_tnef_decoder
 
             case self::MAPI_ATTACH_MIME_TAG:
                 // Is this ever set, and what is format?
-                $value = explode('/', trim($value));
+                $value = explode('/', $value);
                 $result['type']    = $value[0];
                 $result['subtype'] = $value[1];
-                break;
-
-            case self::MAPI_ATTACH_CONTENT_ID:
-                $result['content-id'] = $value;
                 break;
 
             case self::MAPI_ATTACH_DATA:
@@ -463,12 +423,12 @@ class rcube_tnef_decoder
         case self::ARENDDATA:
             // Add a new default data block to hold details of this
             // attachment. Reverse order is easier to handle later!
-            array_unshift($attachment, [
+            array_unshift($attachment, array(
                     'type'    => 'application',
                     'subtype' => 'octet-stream',
                     'name'    => 'unknown',
                     'stream'  => ''
-            ]);
+            ));
 
             break;
 
@@ -585,7 +545,7 @@ class rcube_tnef_decoder
     public static function rtf2text($text)
     {
         $document = '';
-        $stack    = [];
+        $stack    = array();
         $j        = -1;
 
         // Read the data character-by- character…
@@ -784,7 +744,7 @@ class rcube_tnef_decoder
      */
     protected static function _rtfIsPlain($s)
     {
-        $notPlain = ['*', 'fonttbl', 'colortbl', 'datastore', 'themedata', 'stylesheet'];
+        $notPlain = array('*', 'fonttbl', 'colortbl', 'datastore', 'themedata', 'stylesheet');
 
         for ($i = 0; $i < count($notPlain); $i++) {
             if (!empty($s[$notPlain[$i]])) {

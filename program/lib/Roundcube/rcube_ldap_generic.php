@@ -30,19 +30,14 @@ class rcube_ldap_generic extends Net_LDAP3
 {
     /** private properties */
     protected $cache = null;
-    protected $attributes = ['dn'];
+    protected $attributes = array('dn');
     protected $error;
 
-    /**
-     * Class constructor
-     *
-     * @param array $config Configuration
-     */
     function __construct($config = null)
     {
         parent::__construct($config);
 
-        $this->config_set('log_hook', [$this, 'log']);
+        $this->config_set('log_hook', array($this, 'log'));
     }
 
     /**
@@ -69,7 +64,7 @@ class rcube_ldap_generic extends Net_LDAP3
         case LOG_DEBUG:
         case LOG_INFO:
         case LOG_NOTICE:
-            if (!empty($this->config['debug'])) {
+            if ($this->config['debug']) {
                 rcube::write_log('ldap', $msg);
             }
             break;
@@ -224,8 +219,9 @@ class rcube_ldap_generic extends Net_LDAP3
      * @see ldap_list()
      * @see ldap_get_entries()
      */
-    public function list_entries($dn, $filter, $attributes = ['dn'])
+    public function list_entries($dn, $filter, $attributes = array('dn'))
     {
+        $list = array();
         $this->_debug("C: List $dn [{$filter}]");
 
         if ($result = ldap_list($this->conn, $dn, $filter, $attributes)) {
@@ -233,7 +229,7 @@ class rcube_ldap_generic extends Net_LDAP3
 
             if ($list === false) {
                 $this->_error("ldap_get_entries() failed with " . ldap_error($this->conn));
-                return [];
+                return array();
             }
 
             $count = $list['count'];
@@ -242,7 +238,6 @@ class rcube_ldap_generic extends Net_LDAP3
             $this->_debug("S: $count record(s)");
         }
         else {
-            $list = [];
             $this->_error("ldap_list() failed with " . ldap_error($this->conn));
         }
 
@@ -287,14 +282,14 @@ class rcube_ldap_generic extends Net_LDAP3
             return $entry;
         }
 
-        $rec = [];
+        $rec = array();
 
         for ($i=0; $i < $entry['count']; $i++) {
             $attr = $entry[$i];
             if ($entry[$attr]['count'] == 1) {
                 switch ($attr) {
                     case 'objectclass':
-                        $rec[$attr] = [strtolower($entry[$attr][0])];
+                        $rec[$attr] = array(strtolower($entry[$attr][0]));
                         break;
                     default:
                         $rec[$attr] = $entry[$attr][0];
@@ -315,23 +310,23 @@ class rcube_ldap_generic extends Net_LDAP3
      * Compose an LDAP filter string matching all words from the search string
      * in the given list of attributes.
      *
-     * @param string $value Search value
-     * @param mixed  $attrs List of LDAP attributes to search
-     * @param int    $mode  Matching mode:
-     *                      0 - partial (*abc*),
-     *                      1 - strict (=),
-     *                      2 - prefix (abc*)
+     * @param string  $value    Search value
+     * @param mixed   $attrs    List of LDAP attributes to search
+     * @param int     $mode     Matching mode:
+     *                          0 - partial (*abc*),
+     *                          1 - strict (=),
+     *                          2 - prefix (abc*)
      * @return string LDAP filter
      */
     public static function fulltext_search_filter($value, $attributes, $mode = 1)
     {
         if (empty($attributes)) {
-            $attributes = ['cn'];
+            $attributes = array('cn');
         }
 
-        $groups = [];
-        $value  = str_replace('*', '', $value);
-        $words  = $mode == 0 ? rcube_utils::tokenize_string($value, 1) : [$value];
+        $groups = array();
+        $value = str_replace('*', '', $value);
+        $words = $mode == 0 ? rcube_utils::tokenize_string($value, 1) : array($value);
 
         // set wildcards
         $wp = $ws = '';
@@ -342,15 +337,16 @@ class rcube_ldap_generic extends Net_LDAP3
 
         // search each word in all listed attributes
         foreach ($words as $word) {
-            $parts = [];
-
+            $parts = array();
             foreach ($attributes as $attr) {
                 $parts[] = "($attr=$wp" . self::quote_string($word) . "$ws)";
             }
-
             $groups[] = '(|' . implode('', $parts) . ')';
         }
 
         return count($groups) > 1 ? '(&' . implode('', $groups) . ')' : implode('', $groups);
     }
 }
+
+// for backward compat.
+class rcube_ldap_result extends Net_LDAP3_Result {}

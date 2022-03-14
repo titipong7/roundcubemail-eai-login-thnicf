@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Brúkara upplýsing';
-$labels['infoforuser'] = 'Upplýsingar fyri brúkara';
 $labels['created'] = 'Stovnaður';
 $labels['lastlogin'] = 'Seinast innritaður';
 $labels['defaultidentity'] = 'Sjálvsett samleiki';
-$labels['userid'] = 'ID';

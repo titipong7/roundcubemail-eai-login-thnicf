@@ -54,7 +54,5 @@ $labels['flagflagged'] = 'Markita';
 $labels['notifymethodmailto'] = 'Retpoŝto';
 $labels['notifymethodtel'] = 'Telefono';
 $labels['datetest'] = 'Dato';
-$labels['spamtestequals'] = 'egalas al';
-$labels['spamtestnotequals'] = 'ne egalas al';
 $labels['vacation.subject'] = 'Temo';
 $labels['vacation.keep'] = 'Manteni';

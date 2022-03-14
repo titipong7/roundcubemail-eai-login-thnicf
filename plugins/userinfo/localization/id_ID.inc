@@ -18,4 +18,3 @@ $labels['userinfo'] = 'Informasi pengguna';
 $labels['created'] = 'Telah dibuat';
 $labels['lastlogin'] = 'Masuk Terakhir';
 $labels['defaultidentity'] = 'Identitas Standar';
-$labels['userid'] = 'ID';

@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Zobrazit smajlíky v textovém formátu';
 $labels['emoticonscompose'] = 'Povolit smajlíky';
+?>

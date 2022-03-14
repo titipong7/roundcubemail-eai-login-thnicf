@@ -42,13 +42,12 @@ class rcube_pw_usermod_password
             return PASSWORD_SUCCESS;
         }
 
-        rcube::raise_error([
+        rcube::raise_error(array(
                 'code' => 600,
-                'file' => __FILE__,
-                'line' => __LINE__,
+                'type' => 'php',
+                'file' => __FILE__, 'line' => __LINE__,
                 'message' => "Password plugin: Unable to execute $cmd"
-            ], true, false
-        );
+            ), true, false);
 
         return PASSWORD_ERROR;
     }

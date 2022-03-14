@@ -55,3 +55,4 @@ $labels['shortaclother'] = 'Бусад';
 $labels['shortaclread'] = 'Унших';
 $labels['shortaclwrite'] = 'Бичих';
 $labels['shortacldelete'] = 'Устгах';
+?>

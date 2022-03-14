@@ -42,7 +42,7 @@ class rcube_plesk_password
     /**
      * This method is called from roundcube to change the password
      *
-     * roundcube already validated the old password so we just need to change it at this point
+     * roundcube allready validated the old password so we just need to change it at this point
      *
      * @author Cyrill von Wattenwyl <cyrill.vonwattenwyl@adfinis-sygroup.ch>
      * @param string $curpass Current password
@@ -91,7 +91,6 @@ class rcube_plesk_password
 class plesk_rpc
 {
     protected $old_version = false;
-    protected $curl;
 
     /**
      * init plesk-rpc via curl
@@ -105,11 +104,11 @@ class plesk_rpc
      */
     function init($host, $port, $path, $user, $pass)
     {
-        $headers = [
+        $headers = array(
             sprintf("HTTP_AUTH_LOGIN: %s", $user),
             sprintf("HTTP_AUTH_PASSWD: %s", $pass),
             "Content-Type: text/xml"
-        ];
+        );
 
         $url        = sprintf("https://%s:%s/%s", $host, $port, $path);
         $this->curl = curl_init();
@@ -164,7 +163,6 @@ class plesk_rpc
 
         $dataset->addChild("hosting");
         $packet = $request->asXML();
-        $xml    = null;
 
         // send the request and make it to simple-xml-object
         if ($res = $this->send_request($packet)) {
@@ -246,12 +244,11 @@ class plesk_rpc
             $res = strval($xml->mail->update->set->result->status);
 
             if ($res != "ok") {
-                $res = [
+                $res = array(
                     'code' => PASSWORD_ERROR,
                     'message' => strval($xml->mail->update->set->result->errtext)
-                ];
+                );
             }
-
             return $res;
         }
 

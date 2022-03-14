@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Birta tjáningartákn í skilaboðum með hreinum texta';
 $labels['emoticonscompose'] = 'Virkja tjáningartákn';
+?>

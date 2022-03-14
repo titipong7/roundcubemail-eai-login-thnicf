@@ -30,7 +30,11 @@ class rcube_db_mssql extends rcube_db
     public $db_provider = 'mssql';
 
     /**
-     * {@inheritdoc}
+     * Object constructor
+     *
+     * @param string $db_dsnw DSN for read/write operations
+     * @param string $db_dsnr Optional DSN for read only operations
+     * @param bool   $pconn   Enables persistent connections
      */
     public function __construct($db_dsnw, $db_dsnr = '', $pconn = false)
     {
@@ -91,7 +95,7 @@ class rcube_db_mssql extends rcube_db
     {
         $args = func_get_args();
 
-        if (!empty($args) && is_array($args[0])) {
+        if (is_array($args[0])) {
             $args = $args[0];
         }
 
@@ -143,18 +147,18 @@ class rcube_db_mssql extends rcube_db
      */
     protected function dsn_string($dsn)
     {
-        $params = [];
+        $params = array();
         $result = $dsn['phptype'] . ':';
 
-        if (isset($dsn['hostspec'])) {
+        if ($dsn['hostspec']) {
             $host = $dsn['hostspec'];
-            if (isset($dsn['port'])) {
+            if ($dsn['port']) {
                 $host .= ',' . $dsn['port'];
             }
             $params[] = 'host=' . $host;
         }
 
-        if (isset($dsn['database'])) {
+        if ($dsn['database']) {
             $params[] = 'dbname=' . $dsn['database'];
         }
 
@@ -178,7 +182,7 @@ class rcube_db_mssql extends rcube_db
         $sql = preg_replace_callback(
             '/((TABLE|(?<!ON )UPDATE|INSERT INTO|FROM(?! deleted)| ON(?! (DELETE|UPDATE|\[PRIMARY\]))'
             . '|REFERENCES|CONSTRAINT|TRIGGER|INDEX)\s+(\[dbo\]\.)?[\[\]]*)([^\[\]\( \r\n]+)/',
-            [$this, 'fix_table_names_callback'],
+            array($this, 'fix_table_names_callback'),
             $sql
         );
 

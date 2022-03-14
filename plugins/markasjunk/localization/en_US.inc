@@ -14,7 +14,7 @@
  For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-markasjunk/
 */
 
-$labels = [];
+$labels = array();
 $labels['buttonjunk'] = 'This message is junk';
 $labels['asjunk'] = 'As junk';
 $labels['markasjunk'] = 'Mark as junk';
@@ -23,6 +23,6 @@ $labels['asnotjunk'] = 'As not junk';
 $labels['markasnotjunk'] = 'Mark as not junk';
 $labels['notjunk'] = 'Not junk';
 
-$messages = [];
+$messages = array();
 $messages['reportedasjunk'] = 'Successfully reported as junk';
 $messages['reportedasnotjunk'] = 'Successfully reported as not junk';

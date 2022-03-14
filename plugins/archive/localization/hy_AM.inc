@@ -27,3 +27,4 @@ $labels['archivetypemonth'] = 'Ամսաթիվ (օր.՝ Արխիվ/2012/06)';
 $labels['archivetypefolder'] = 'Առաջին պանակը';
 $labels['archivetypesender'] = 'Ուղարկողի էլ-փոստը';
 $labels['unkownsender'] = 'անհայտ';
+?>

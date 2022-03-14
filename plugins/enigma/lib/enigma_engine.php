@@ -28,11 +28,11 @@ class enigma_engine
     private $pgp_driver;
     private $smime_driver;
     private $password_time;
-    private $cache = [];
+    private $cache = array();
 
-    public $decryptions     = [];
-    public $signatures      = [];
-    public $encrypted_parts = [];
+    public $decryptions     = array();
+    public $signatures      = array();
+    public $encrypted_parts = array();
 
     const ENCRYPTED_PARTIALLY = 100;
 
@@ -77,11 +77,11 @@ class enigma_engine
         $this->pgp_driver = new $driver($username);
 
         if (!$this->pgp_driver) {
-            rcube::raise_error([
-                    'code' => 600, 'file' => __FILE__, 'line' => __LINE__,
-                    'message' => "Enigma plugin: Unable to load PGP driver: $driver"
-                ], true, true
-            );
+            rcube::raise_error(array(
+                'code' => 600, 'type' => 'php',
+                'file' => __FILE__, 'line' => __LINE__,
+                'message' => "Enigma plugin: Unable to load PGP driver: $driver"
+            ), true, true);
         }
 
         // Initialise driver
@@ -108,11 +108,11 @@ class enigma_engine
         $this->smime_driver = new $driver($username);
 
         if (!$this->smime_driver) {
-            rcube::raise_error([
-                    'code' => 600, 'file' => __FILE__, 'line' => __LINE__,
-                    'message' => "Enigma plugin: Unable to load S/MIME driver: $driver"
-                ], true, true
-            );
+            rcube::raise_error(array(
+                'code' => 600, 'type' => 'php',
+                'file' => __FILE__, 'line' => __LINE__,
+                'message' => "Enigma plugin: Unable to load S/MIME driver: $driver"
+            ), true, true);
         }
 
         // Initialise driver
@@ -126,8 +126,8 @@ class enigma_engine
     /**
      * Handler for message signing
      *
-     * @param Mail_mime &$message Original message
-     * @param int       $mode     Encryption mode
+     * @param Mail_mime Original message
+     * @param int       Encryption mode
      *
      * @return enigma_error On error returns error object
      */
@@ -145,11 +145,11 @@ class enigma_engine
 
         // check if we have password for this key
         $passwords = $this->get_passwords();
-        $pass      = $passwords[$key->id] ?? null;
+        $pass      = $passwords[$key->id];
 
-        if ($pass === null && !$this->rc->config->get('enigma_passwordless')) {
+        if ($pass === null) {
             // ask for password
-            $error = ['missing' => [$key->id => $key->name]];
+            $error = array('missing' => array($key->id => $key->name));
             return new enigma_error(enigma_error::BADPASS, '', $error);
         }
 
@@ -203,7 +203,7 @@ class enigma_engine
         if ($result !== true) {
             if ($result->getCode() == enigma_error::BADPASS) {
                 // ask for password
-                $error = ['bad' => [$key->id => $key->name]];
+                $error = array('bad' => array($key->id => $key->name));
                 return new enigma_error(enigma_error::BADPASS, '', $error);
             }
 
@@ -213,9 +213,7 @@ class enigma_engine
         // replace message body
         if ($pgp_mode == Crypt_GPG::SIGN_MODE_CLEAR) {
             $message->setTXTBody($body);
-            if (!empty($text_charset)) {
-                $message->setParam('text_charset', $text_charset);
-            }
+            $message->setParam('text_charset', $text_charset);
         }
         else {
             $mime->addPGPSignature($body, $this->pgp_driver->signature_algorithm());
@@ -226,9 +224,9 @@ class enigma_engine
     /**
      * Handler for message encryption
      *
-     * @param Mail_mime &$message Original message
-     * @param int       $mode     Encryption mode
-     * @param bool      $is_draft Is draft-save action - use only sender's key for encryption
+     * @param Mail_mime Original message
+     * @param int       Encryption mode
+     * @param bool      Is draft-save action - use only sender's key for encryption
      *
      * @return enigma_error On error returns error object
      */
@@ -238,9 +236,6 @@ class enigma_engine
 
         // always use sender's key
         $from = $mime->getFromAddress();
-
-        $sign_key = null;
-        $keys     = [];
 
         // check senders key for signing
         if ($mode & self::ENCRYPT_MODE_SIGN) {
@@ -252,18 +247,18 @@ class enigma_engine
 
             // check if we have password for this key
             $passwords = $this->get_passwords();
-            $sign_pass = $passwords[$sign_key->id] ?? null;
+            $sign_pass = $passwords[$sign_key->id];
 
-            if ($sign_pass === null && !$this->rc->config->get('enigma_passwordless')) {
+            if ($sign_pass === null) {
                 // ask for password
-                $error = ['missing' => [$sign_key->id => $sign_key->name]];
+                $error = array('missing' => array($sign_key->id => $sign_key->name));
                 return new enigma_error(enigma_error::BADPASS, '', $error);
             }
 
             $sign_key->password = $sign_pass;
         }
 
-        $recipients = [$from];
+        $recipients = array($from);
 
         // if it's not a draft we add all recipients' keys
         if (!$is_draft) {
@@ -282,7 +277,9 @@ class enigma_engine
             }
 
             if (empty($key)) {
-                return new enigma_error(enigma_error::KEYNOTFOUND, '', ['missing' => $email]);
+                return new enigma_error(enigma_error::KEYNOTFOUND, '', array(
+                    'missing' => $email
+                ));
             }
 
             $keys[] = $key;
@@ -316,7 +313,7 @@ class enigma_engine
         if ($result !== true) {
             if ($result->getCode() == enigma_error::BADPASS) {
                 // ask for password
-                $error = ['bad' => [$sign_key->id => $sign_key->name]];
+                $error = array('bad' => array($sign_key->id => $sign_key->name));
                 return new enigma_error(enigma_error::BADPASS, '', $error);
             }
 
@@ -336,7 +333,7 @@ class enigma_engine
     /**
      * Handler for attaching public key to a message
      *
-     * @param Mail_mime &$message Original message
+     * @param Mail_mime Original message
      *
      * @return bool True on success, False on failure
      */
@@ -344,7 +341,7 @@ class enigma_engine
     {
         $headers = $message->headers();
         $from    = rcube_mime::decode_address_list($headers['From'], 1, false, null, true);
-        $from    = $from[1] ?? null;
+        $from    = $from[1];
 
         // find my key
         if ($from && ($key = $this->find_key($from, true))) {
@@ -364,8 +361,8 @@ class enigma_engine
      * Handler for message_part_structure hook.
      * Called for every part of the message.
      *
-     * @param array  $p    Original parameters
-     * @param string $body Part body (will be set if used internally)
+     * @param array  Original parameters
+     * @param string Part body (will be set if used internally)
      *
      * @return array Modified parameters
      */
@@ -400,7 +397,7 @@ class enigma_engine
             $got_content = true;
         }
         else {
-            $got_content = !empty($p['structure']->type) && $p['structure']->type === 'content';
+            $got_content = $p['structure']->type === 'content';
         }
 
         return $p;
@@ -409,14 +406,14 @@ class enigma_engine
     /**
      * Handler for message_part_body hook.
      *
-     * @param array $p Original parameters
+     * @param array Original parameters
      *
      * @return array Modified parameters
      */
     function part_body($p)
     {
         // encrypted attachment, see parse_plain_encrypted()
-        if (!empty($p['part']->need_decryption) && $p['part']->body === null) {
+        if ($p['part']->need_decryption && $p['part']->body === null) {
             $this->load_pgp_driver();
 
             $storage = $this->rc->get_storage();
@@ -437,8 +434,8 @@ class enigma_engine
     /**
      * Handler for plain/text message.
      *
-     * @param array  &$p   Reference to hook's parameters
-     * @param string $body Part body (will be set if used internally)
+     * @param array  Reference to hook's parameters
+     * @param string Part body (will be set if used internally)
      */
     function parse_plain(&$p, $body = null)
     {
@@ -462,16 +459,16 @@ class enigma_engine
         $body   = '';
         $prefix = '';
         $mode   = '';
-        $tokens = [
+        $tokens = array(
             'BEGIN PGP SIGNED MESSAGE' => 'signed-start',
             'END PGP SIGNATURE'        => 'signed-end',
             'BEGIN PGP MESSAGE'        => 'encrypted-start',
             'END PGP MESSAGE'          => 'encrypted-end',
-        ];
+        );
         $regexp = '/^-----(' . implode('|', array_keys($tokens)) . ')-----[\r\n]*/';
 
         while (($line = fgets($fd)) !== false) {
-            if (strlen($line) > 5 && $line[0] === '-' && $line[4] === '-' && preg_match($regexp, $line, $m)) {
+            if ($line[0] === '-' && $line[4] === '-' && preg_match($regexp, $line, $m)) {
                 switch ($tokens[$m[1]]) {
                 case 'signed-start':
                     $body = $line;
@@ -523,15 +520,15 @@ class enigma_engine
     /**
      * Handler for multipart/signed message.
      *
-     * @param array  &$p   Reference to hook's parameters
-     * @param string $body Part body (will be set if used internally)
+     * @param array  Reference to hook's parameters
+     * @param string Part body (will be set if used internally)
      */
     function parse_signed(&$p, $body = null)
     {
         $struct = $p['structure'];
 
         // S/MIME
-        if (!empty($struct->parts[1]) && $struct->parts[1]->mimetype == 'application/pkcs7-signature') {
+        if ($struct->parts[1] && $struct->parts[1]->mimetype == 'application/pkcs7-signature') {
             $this->parse_smime_signed($p, $body);
         }
         // PGP/MIME: RFC3156
@@ -550,7 +547,7 @@ class enigma_engine
     /**
      * Handler for multipart/encrypted message.
      *
-     * @param array &$p Reference to hook's parameters
+     * @param array Reference to hook's parameters
      */
     function parse_encrypted(&$p)
     {
@@ -578,9 +575,9 @@ class enigma_engine
      * Handler for plain signed message.
      * Excludes message and signature bodies and verifies signature.
      *
-     * @param array  &$p     Reference to hook's parameters
-     * @param string $body   Message (part) body
-     * @param string $prefix Body prefix (additional text before the encrypted block)
+     * @param array  Reference to hook's parameters
+     * @param string Message (part) body
+     * @param string Body prefix (additional text before the encrypted block)
      */
     private function parse_plain_signed(&$p, $body, $prefix = '')
     {
@@ -611,15 +608,12 @@ class enigma_engine
 
         // Extract body (and signature?)
         while (($line = fgets($fd, 1024)) !== false) {
-            if ($part->body === null) {
+            if ($part->body === null)
                 $part->body = '';
-            }
-            else if (preg_match('/^-----BEGIN PGP SIGNATURE-----/', $line)) {
+            else if (preg_match('/^-----BEGIN PGP SIGNATURE-----/', $line))
                 break;
-            }
-            else {
+            else
                 $part->body .= $line;
-            }
         }
 
         fclose($fd);
@@ -644,8 +638,8 @@ class enigma_engine
      * Handler for PGP/MIME signed message.
      * Verifies signature.
      *
-     * @param array  &$p   Reference to hook's parameters
-     * @param string $body Part body (will be set if used internally)
+     * @param array  Reference to hook's parameters
+     * @param string Part body (will be set if used internally)
      */
     private function parse_pgp_signed(&$p, $body = null)
     {
@@ -665,7 +659,7 @@ class enigma_engine
 
         // Get bodies
         if ($body === null) {
-            if (empty($struct->body_modified)) {
+            if (!$struct->body_modified) {
                 $body = $this->get_part_body($p['object'], $struct);
             }
         }
@@ -674,7 +668,7 @@ class enigma_engine
 
         // when it is a signed message forwarded as attachment
         // ctype_parameters property will not be set
-        if (!$boundary && !empty($struct->headers['content-type'])
+        if (!$boundary && $struct->headers['content-type']
             && preg_match('/boundary="?([a-zA-Z0-9\'()+_,-.\/:=?]+)"?/', $struct->headers['content-type'], $m)
         ) {
             $boundary = $m[1];
@@ -697,8 +691,8 @@ class enigma_engine
      * Handler for S/MIME signed message.
      * Verifies signature.
      *
-     * @param array  &$p   Reference to hook's parameters
-     * @param string $body Part body (will be set if used internally)
+     * @param array  Reference to hook's parameters
+     * @param string Part body (will be set if used internally)
      */
     private function parse_smime_signed(&$p, $body = null)
     {
@@ -712,9 +706,9 @@ class enigma_engine
     /**
      * Handler for plain encrypted message.
      *
-     * @param array  &$p     Reference to hook's parameters
-     * @param string $body   Message (part) body
-     * @param string $prefix Body prefix (additional text before the encrypted block)
+     * @param array  Reference to hook's parameters
+     * @param string Message (part) body
+     * @param string Body prefix (additional text before the encrypted block)
      */
     private function parse_plain_encrypted(&$p, $body, $prefix = '')
     {
@@ -767,8 +761,8 @@ class enigma_engine
             // This is what happens when you select "Encrypt each attachment separately
             // and send the message using inline PGP" in Thunderbird's Enigmail.
 
-            if (!empty($p['object']->mime_parts[$parent])) {
-                foreach ((array) $p['object']->mime_parts[$parent]->parts as $p) {
+            if ($p['object']->mime_parts[$parent]) {
+                foreach ((array)$p['object']->mime_parts[$parent]->parts as $p) {
                     if ($p->disposition == 'attachment' && $p->mimetype == 'application/octet-stream'
                         && preg_match('/^(.*)\.pgp$/i', $p->filename, $m)
                     ) {
@@ -785,8 +779,8 @@ class enigma_engine
         // decryption failed, but the message may have already
         // been cached with the modified parts (see above),
         // let's bring the original state back
-        else if (!empty($p['object']->mime_parts[$parent])) {
-            foreach ((array) $p['object']->mime_parts[$parent]->parts as $p) {
+        else if ($p['object']->mime_parts[$parent]) {
+            foreach ((array)$p['object']->mime_parts[$parent]->parts as $p) {
                 if ($p->need_decryption && !preg_match('/^(.*)\.pgp$/i', $p->filename, $m)) {
                     // modify filename
                     $p->filename .= '.pgp';
@@ -800,7 +794,7 @@ class enigma_engine
     /**
      * Handler for PGP/MIME encrypted message.
      *
-     * @param array &$p Reference to hook's parameters
+     * @param array Reference to hook's parameters
      */
     private function parse_pgp_encrypted(&$p)
     {
@@ -827,11 +821,11 @@ class enigma_engine
             $this->modify_structure($p, $struct, strlen($body));
 
             // Parse the structure (there may be encrypted/signed parts inside
-            $this->part_structure([
+            $this->part_structure(array(
                     'object'    => $p['object'],
                     'structure' => $struct,
                     'mimetype'  => $struct->mimetype
-                ], $body);
+                ), $body);
 
             // Attach the decryption message to all parts
             $this->decryptions[$struct->mime_id] = $result;
@@ -858,7 +852,7 @@ class enigma_engine
     /**
      * Handler for S/MIME encrypted message.
      *
-     * @param array &$p Reference to hook's parameters
+     * @param array Reference to hook's parameters
      */
     private function parse_smime_encrypted(&$p)
     {
@@ -872,18 +866,14 @@ class enigma_engine
     /**
      * PGP signature verification.
      *
-     * @param mixed &$msg_body Message body
-     * @param mixed $sig_body  Signature body (for MIME messages)
+     * @param mixed Message body
+     * @param mixed Signature body (for MIME messages)
      *
      * @return mixed enigma_signature or enigma_error
      */
     private function pgp_verify(&$msg_body, $sig_body = null)
     {
         // @TODO: Handle big bodies using (temp) files
-
-        // Get rid of possible non-ascii characters (#5962)
-        $sig_body = preg_replace('/[^\x00-\x7F]/', '', $sig_body);
-
         $sig = $this->pgp_driver->verify($msg_body, $sig_body);
 
         if (($sig instanceof enigma_error) && $sig->getCode() != enigma_error::KEYNOTFOUND) {
@@ -904,10 +894,6 @@ class enigma_engine
     private function pgp_decrypt(&$msg_body, &$signature = null)
     {
         // @TODO: Handle big bodies using (temp) files
-
-        // Get rid of possible non-ascii characters (#5962)
-        $msg_body = preg_replace('/[^\x00-\x7F]/', '', $msg_body);
-
         $keys   = $this->get_passwords();
         $result = $this->pgp_driver->decrypt($msg_body, $keys, $signature);
 
@@ -927,9 +913,9 @@ class enigma_engine
     /**
      * PGP message signing
      *
-     * @param mixed      &$msg_body Message body
-     * @param enigma_key $key       The key (with passphrase)
-     * @param int        $mode      Signing mode
+     * @param mixed      Message body
+     * @param enigma_key The key (with passphrase)
+     * @param int        Signing mode
      *
      * @return mixed True or enigma_error
      */
@@ -954,10 +940,10 @@ class enigma_engine
     /**
      * PGP message encrypting
      *
-     * @param mixed  &$msg_body Message body
-     * @param array  $keys      Keys (array of enigma_key objects)
-     * @param string $sign_key  Optional signing Key ID
-     * @param string $sign_pass Optional signing Key password
+     * @param mixed  Message body
+     * @param array  Keys (array of enigma_key objects)
+     * @param string Optional signing Key ID
+     * @param string Optional signing Key password
      *
      * @return mixed True or enigma_error
      */
@@ -982,7 +968,7 @@ class enigma_engine
     /**
      * PGP keys listing.
      *
-     * @param mixed $pattern Key ID/Name pattern
+     * @param mixed Key ID/Name pattern
      *
      * @return mixed Array of keys or enigma_error
      */
@@ -1001,8 +987,8 @@ class enigma_engine
     /**
      * Find PGP private/public key
      *
-     * @param string $email    E-mail address
-     * @param bool   $can_sign Need a key for signing?
+     * @param string E-mail address
+     * @param bool   Need a key for signing?
      *
      * @return enigma_key The key
      */
@@ -1045,7 +1031,7 @@ class enigma_engine
     /**
      * PGP key details.
      *
-     * @param mixed $keyid Key ID
+     * @param mixed Key ID
      *
      * @return mixed enigma_key or enigma_error
      */
@@ -1064,7 +1050,7 @@ class enigma_engine
     /**
      * PGP key delete.
      *
-     * @param string $keyid Key ID
+     * @param string Key ID
      *
      * @return enigma_error|bool True on success
      */
@@ -1083,7 +1069,7 @@ class enigma_engine
     /**
      * PGP keys pair generation.
      *
-     * @param array $data Key pair parameters
+     * @param array Key pair parameters
      *
      * @return mixed enigma_key or enigma_error
      */
@@ -1102,8 +1088,8 @@ class enigma_engine
     /**
      * PGP keys/certs import.
      *
-     * @param mixed   $content Import file name or content
-     * @param boolean $isfile  True if first argument is a filename
+     * @param mixed   Import file name or content
+     * @param boolean True if first argument is a filename
      *
      * @return mixed Import status data array or enigma_error
      */
@@ -1126,9 +1112,9 @@ class enigma_engine
     /**
      * PGP keys/certs export.
      *
-     * @param string   $key             Key ID
-     * @param resource $fp              Optional output stream
-     * @param bool     $include_private Include private key
+     * @param string   Key ID
+     * @param resource Optional output stream
+     * @param bool     Include private key
      *
      * @return mixed Key content or enigma_error
      */
@@ -1155,10 +1141,10 @@ class enigma_engine
      */
     function password_handler()
     {
-        $keyid  = rcube_utils::get_input_string('_keyid', rcube_utils::INPUT_POST);
-        $passwd = rcube_utils::get_input_string('_passwd', rcube_utils::INPUT_POST, true);
+        $keyid  = rcube_utils::get_input_value('_keyid', rcube_utils::INPUT_POST);
+        $passwd = rcube_utils::get_input_value('_passwd', rcube_utils::INPUT_POST, true);
 
-        if ($keyid && strlen($passwd)) {
+        if ($keyid && $passwd !== null && strlen($passwd)) {
             $this->save_password(strtoupper($keyid), $passwd);
         }
     }
@@ -1169,14 +1155,12 @@ class enigma_engine
     function save_password($keyid, $password)
     {
         // we store passwords in session for specified time
-        if (!empty($_SESSION['enigma_pass'])) {
-            $config = $this->rc->decrypt($_SESSION['enigma_pass']);
-            $config = unserialize($config);
-        } else {
-            $config = [];
+        if ($config = $_SESSION['enigma_pass']) {
+            $config = $this->rc->decrypt($config);
+            $config = @unserialize($config);
         }
 
-        $config[$keyid] = [$password, time()];
+        $config[$keyid] = array($password, time());
 
         $_SESSION['enigma_pass'] = $this->rc->encrypt(serialize($config));
     }
@@ -1186,29 +1170,27 @@ class enigma_engine
      */
     function get_passwords()
     {
-        if (!empty($_SESSION['enigma_pass'])) {
-            $config = $this->rc->decrypt($_SESSION['enigma_pass']);
+        if ($config = $_SESSION['enigma_pass']) {
+            $config = $this->rc->decrypt($config);
             $config = @unserialize($config);
         }
 
         $threshold = $this->password_time ? time() - $this->password_time : 0;
-        $keys      = [];
+        $keys      = array();
 
         // delete expired passwords
-        if (!empty($config)) {
-            foreach ($config as $key => $value) {
-                if ($threshold && $value[1] < $threshold) {
-                    unset($config[$key]);
-                    $modified = true;
-                }
-                else {
-                    $keys[$key] = $value[0];
-                }
+        foreach ((array) $config as $key => $value) {
+            if ($threshold && $value[1] < $threshold) {
+                unset($config[$key]);
+                $modified = true;
             }
+            else {
+                $keys[$key] = $value[0];
+            }
+        }
 
-            if (!empty($modified)) {
-                $_SESSION['enigma_pass'] = $this->rc->encrypt(serialize($config));
-            }
+        if ($modified) {
+            $_SESSION['enigma_pass'] = $this->rc->encrypt(serialize($config));
         }
 
         return $keys;
@@ -1217,8 +1199,8 @@ class enigma_engine
     /**
      * Get message part body.
      *
-     * @param rcube_message      $msg  Message object
-     * @param rcube_message_part $part Message part
+     * @param rcube_message      Message object
+     * @param rcube_message_part Message part
      */
     private function get_part_body($msg, $part)
     {
@@ -1239,12 +1221,17 @@ class enigma_engine
             $body    = $storage->get_message_part($msg->uid, $part->mime_id, $part,
                 null, null, true, 0, false);
 
-            if (!empty($reset)) {
+            if ($reset) {
                 $part->size = 0;
             }
         }
         else {
             $body = $msg->get_part_body($part->mime_id, false);
+
+            // Convert charset to get rid of possible non-ascii characters (#5962)
+            if ($part->charset && stripos($part->charset, 'ASCII') === false) {
+                $body = rcube_charset::convert($body, $part->charset, 'US-ASCII');
+            }
         }
 
         return $body;
@@ -1253,7 +1240,7 @@ class enigma_engine
     /**
      * Parse decrypted message body into structure
      *
-     * @param string &$body Message body
+     * @param string Message body
      *
      * @return array Message structure
      */
@@ -1263,15 +1250,17 @@ class enigma_engine
         $body = preg_replace('/\r?\n/', "\r\n", $body);
 
         // parse the body into structure
-        return rcube_mime::parse_message($body);
+        $struct = rcube_mime::parse_message($body);
+
+        return $struct;
     }
 
     /**
      * Replace message encrypted structure with decrypted message structure
      *
-     * @param array              &$p     Hook arguments
-     * @param rcube_message_part $struct Part structure
-     * @param int                $size   Part size
+     * @param array              Hook arguments
+     * @param rcube_message_part Part structure
+     * @param int                Part size
      */
     private function modify_structure(&$p, $struct, $size = 0)
     {
@@ -1300,9 +1289,8 @@ class enigma_engine
     /**
      * Modify decrypted message part
      *
-     * @param rcube_message_part $part
-     * @param rcube_message      $msg
-     * @param string             $old_id
+     * @param rcube_message_part
+     * @param rcube_message
      */
     private function modify_structure_part($part, $msg, $old_id)
     {
@@ -1331,7 +1319,7 @@ class enigma_engine
     private function explode_signed_body($body, $boundary)
     {
         if (!$body) {
-            return [];
+            return array();
         }
 
         $boundary     = '--' . $boundary;
@@ -1349,13 +1337,13 @@ class enigma_engine
         $sig = substr($sig, strpos($sig, "\r\n\r\n") + 4);
         $sig = substr($sig, 0, strpos($sig, $boundary));
 
-        return [$body, $sig];
+        return array($body, $sig);
     }
 
     /**
      * Checks if specified message part is a PGP-key or S/MIME cert data
      *
-     * @param rcube_message_part $part Part object
+     * @param rcube_message_part Part object
      *
      * @return boolean True if part is a key/cert
      */
@@ -1371,7 +1359,7 @@ class enigma_engine
     /**
      * Removes all user keys and assigned data
      *
-     * @param string $username Username
+     * @param string Username
      *
      * @return bool True on success, False on failure
      */
@@ -1386,7 +1374,7 @@ class enigma_engine
     /**
      * Recursive method to remove directory with its content
      *
-     * @param string $dir Directory
+     * @param string Directory
      */
     public static function delete_dir($dir)
     {
@@ -1418,28 +1406,17 @@ class enigma_engine
     }
 
     /**
-     * Check if specified driver feature is supported
-     */
-    public function is_supported($feature)
-    {
-        $this->load_pgp_driver();
-
-        return in_array($feature, $this->pgp_driver->capabilities());
-    }
-
-    /**
      * Raise/log (relevant) errors
      */
     protected static function raise_error($result, $line, $abort = false)
     {
         if ($result->getCode() != enigma_error::BADPASS) {
-            rcube::raise_error([
+            rcube::raise_error(array(
                     'code'    => 600,
                     'file'    => __FILE__,
                     'line'    => $line,
                     'message' => "Enigma plugin: " . $result->getMessage()
-                ], true, $abort
-            );
+                ), true, $abort);
         }
     }
 }

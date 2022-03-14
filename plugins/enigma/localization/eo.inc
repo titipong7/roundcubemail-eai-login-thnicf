@@ -18,3 +18,4 @@ $labels['subkeycreated'] = 'Kreita';
 $labels['expiresnever'] = 'neniam';
 $labels['unknown'] = 'nekonata';
 $labels['newkeypass'] = 'Pasvorto';
+?>

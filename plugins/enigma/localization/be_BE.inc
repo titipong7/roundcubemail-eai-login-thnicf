@@ -20,3 +20,4 @@ $labels['expiresnever'] = 'ніколі';
 $labels['unknown'] = 'невядома';
 $labels['keychpass'] = 'Змяніць пароль';
 $labels['newkeypass'] = 'Пароль';
+?>

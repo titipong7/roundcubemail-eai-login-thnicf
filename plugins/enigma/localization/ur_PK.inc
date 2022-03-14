@@ -16,3 +16,4 @@
 
 
 $labels['newkeypass'] = 'پاسورڈ';
+?>

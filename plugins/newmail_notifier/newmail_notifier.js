@@ -101,7 +101,7 @@ function newmail_notifier_sound()
     catch (e) {
         elem = $('<embed id="sound" src="' + src + '" hidden=true autostart=true loop=false />');
         elem.appendTo($('body'));
-        setTimeout("$('#sound').remove()", 5000);
+        window.setTimeout("$('#sound').remove()", 5000);
     }
 }
 

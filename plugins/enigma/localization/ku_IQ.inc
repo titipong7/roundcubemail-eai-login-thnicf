@@ -19,3 +19,4 @@ $labels['subkeycreated'] = 'دروستکرا';
 $labels['unknown'] = 'نەناسراو';
 $labels['keychpass'] = 'گۆڕینی تێپەڕەوشە';
 $labels['newkeypass'] = 'تێپەڕەوشە';
+?>

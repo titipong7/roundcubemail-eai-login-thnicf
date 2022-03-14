@@ -27,3 +27,4 @@ $labels['archivetypemonth'] = 'Meh (wek Arşîv/2012/06)';
 $labels['archivetypefolder'] = 'Dosyeya resen';
 $labels['archivetypesender'] = 'Emaila şandyar';
 $labels['unkownsender'] = 'nenas';
+?>

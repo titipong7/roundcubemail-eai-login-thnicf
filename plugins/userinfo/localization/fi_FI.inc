@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Käyttäjätiedot';
-$labels['infoforuser'] = 'Tietoja käyttäjästä $user';
 $labels['created'] = 'Luotu';
 $labels['lastlogin'] = 'Viimeisin kirjautuminen';
 $labels['defaultidentity'] = 'Oletushenkilöys';
-$labels['userid'] = 'Tunniste';

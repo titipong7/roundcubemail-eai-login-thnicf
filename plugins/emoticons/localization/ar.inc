@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'عرض الأوجه المبتسمة كنص مجرّد في الرسائل';
 $labels['emoticonscompose'] = 'تشغيل الأوجه المبتسمة';
+?>

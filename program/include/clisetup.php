@@ -11,7 +11,7 @@
  | See the README file for a full license statement.                     |
  |                                                                       |
  | PURPOSE:                                                              |
- |   Setup the command line environment and provide some utility         |
+ |   Setup the command line environment and provide some utitlity        |
  |   functions.                                                          |
  +-----------------------------------------------------------------------+
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
@@ -28,3 +28,4 @@ require_once INSTALL_PATH . 'program/include/iniset.php';
 @set_time_limit(0);
 
 $rcmail = rcmail::get_instance();
+$rcmail->output = new rcmail_output_cli();

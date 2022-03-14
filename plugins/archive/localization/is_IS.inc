@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'Upprunaleg mappa';
 $labels['archivetypesender'] = 'Tölvupóstfang sendanda';
 $labels['unkownsender'] = 'óþekkt';
 $labels['readonarchive'] = 'Merkja skilaboð sem lesin þegar þau eru lesin í safni';
+?>

@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'Asl papka';
 $labels['archivetypesender'] = 'Jo‘natuvchi elektron manzili';
 $labels['unkownsender'] = 'noma’lum';
 $labels['readonarchive'] = 'Arxivda xatni o‘qilgan deb belgilang';
+?>

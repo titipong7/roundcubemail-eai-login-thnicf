@@ -623,14 +623,7 @@ function rcube_treelist_widget(node, p)
             // append all elements like links and inputs, but not sub-trees
             .append(li.children(':not(div.treetoggle,ul)').clone(true, true))
             .appendTo(container);
-          
-          // let skins to do their magic, e.g. Elastic will fix pretty checkbox
-          rcmail.triggerEvent('clonerow', {
-            id: node.id,
-            row: sli.get(0)
-          });
-
-          hits.push(node.id);
+            hits.push(node.id);
         }
 
         if (node.children && node.children.length) {
@@ -1090,7 +1083,7 @@ function rcube_treelist_widget(node, p)
 
           if (drag_active && scroll != 0) {
             if (!scroll_timer)
-              scroll_timer = setTimeout(function() { drag_scroll(scroll); }, p.scroll_delay);
+              scroll_timer = window.setTimeout(function(){ drag_scroll(scroll); }, p.scroll_delay);
           }
           else if (scroll_timer) {
             window.clearTimeout(scroll_timer);
@@ -1141,7 +1134,7 @@ function rcube_treelist_widget(node, p)
     scroll_timer = null;
 
     if (list_scroll_top != old_top)
-      scroll_timer = setTimeout(function() { drag_scroll(dir); }, p.scroll_speed);
+      scroll_timer = window.setTimeout(function(){ drag_scroll(dir); }, p.scroll_speed);
   }
 
   /**
@@ -1291,7 +1284,7 @@ function rcube_treelist_widget(node, p)
         create: function(e, ui) { ui_draggable = ui; },
         helper: function(e) {
           return $('<div>').attr('id', 'rcmdraglayer')
-            .text($(e.target).first().text().trim());
+            .text($.trim($(e.target).first().text()));
         }
       }, opts);
 

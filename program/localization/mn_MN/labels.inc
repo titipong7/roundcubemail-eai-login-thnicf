@@ -53,6 +53,5 @@ $labels['other'] = 'Бусад';
 $labels['typeother'] = 'Бусад';
 $labels['delete'] = 'Устгах';
 $labels['about'] = 'Танилцуулга';
-$labels['allmessages'] = 'бүх зурвас';
 $labels['folders'] = 'Хавтас';
 $labels['license'] = 'Лиценз';

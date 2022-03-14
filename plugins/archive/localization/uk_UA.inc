@@ -28,3 +28,4 @@ $labels['archivetypefolder'] = 'Оригінальна тека';
 $labels['archivetypesender'] = 'Відправник email';
 $labels['unkownsender'] = 'невідомо';
 $labels['readonarchive'] = 'Позначити повідомлення як прочитане по архіву';
+?>

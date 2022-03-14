@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'テキスト形式のメッセージで絵文字を表示します。';
 $labels['emoticonscompose'] = '絵文字を有効';
+?>

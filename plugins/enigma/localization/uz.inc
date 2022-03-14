@@ -22,3 +22,4 @@ $labels['expiresnever'] = 'hech qachon';
 $labels['unknown'] = 'noma’lum';
 $labels['keychpass'] = 'Parolni almashtirish';
 $labels['newkeypass'] = 'Parol';
+?>

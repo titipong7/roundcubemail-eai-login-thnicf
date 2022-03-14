@@ -18,3 +18,4 @@ $labels['subkeycreated'] = 'បាន​បង្កើត';
 $labels['expiresnever'] = 'មិនដែល';
 $labels['unknown'] = 'មិន​ស្គាល់';
 $labels['newkeypass'] = 'ពាក្យសំងាត់';
+?>

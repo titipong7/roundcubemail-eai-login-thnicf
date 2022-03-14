@@ -404,7 +404,6 @@ $labels['mailtoprotohandler'] = 'Registrer protokollhandsaming for mailto-lenkje
 $labels['forwardmode'] = 'Meldingar vidaresendast';
 $labels['inline'] = 'i teksten';
 $labels['asattachment'] = 'som vedlegg';
-$labels['allmessages'] = 'alle meldingar';
 $labels['folder'] = 'Mappe';
 $labels['folders'] = 'Mapper';
 $labels['foldername'] = 'Mappenamn';

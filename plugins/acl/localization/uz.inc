@@ -47,3 +47,4 @@ $labels['shortaclt'] = 'O`chirish';
 $labels['shortaclother'] = 'Boshqa';
 $labels['shortaclread'] = 'O`qilgan';
 $labels['shortacldelete'] = 'O`chirish';
+?>

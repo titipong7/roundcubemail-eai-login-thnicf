@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Kullanıcı bilgisi';
-$labels['infoforuser'] = '$user bilgileri';
 $labels['created'] = 'Eklendi';
 $labels['lastlogin'] = 'Son Oturum Açma';
 $labels['defaultidentity'] = 'Varsayılan Kimlik';
-$labels['userid'] = 'Kod';

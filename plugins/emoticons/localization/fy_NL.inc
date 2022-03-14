@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Lit emoticons yn gewoane tekst sjen';
 $labels['emoticonscompose'] = 'Emoticons ynskeakelje';
+?>

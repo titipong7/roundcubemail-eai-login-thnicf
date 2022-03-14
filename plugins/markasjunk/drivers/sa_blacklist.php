@@ -52,23 +52,19 @@ class markasjunk_sa_blacklist
         $this->sa_preference_field = $rcube->config->get('sauserprefs_sql_preference_field');
         $this->sa_value_field      = $rcube->config->get('sauserprefs_sql_value_field');
 
-        $identity = $rcube->user->get_identity();
-        $identity = $identity['email'];
+        $identity_arr = $rcube->user->get_identity();
+        $identity     = $identity_arr['email'];
 
         $this->sa_user = str_replace('%u', $_SESSION['username'], $this->sa_user);
         $this->sa_user = str_replace('%l', $rcube->user->get_username('local'), $this->sa_user);
         $this->sa_user = str_replace('%d', $rcube->user->get_username('domain'), $this->sa_user);
         $this->sa_user = str_replace('%i', $identity, $this->sa_user);
 
-        $config_file = $rcube->config->get('markasjunk_sauserprefs_config');
-        $debug       = $rcube->config->get('markasjunk_debug');
-
-        if (is_file($config_file) && !$rcube->config->load_from_file($config_file)) {
-            rcube::raise_error([
-                    'code' => 527, 'file' => __FILE__, 'line' => __LINE__,
-                    'message' => "Failed to load config from $config_file"
-                ], true, false
-            );
+        if (is_file($rcube->config->get('markasjunk_sauserprefs_config')) && !$rcube->config->load_from_file($rcube->config->get('markasjunk_sauserprefs_config'))) {
+            rcube::raise_error(array('code' => 527, 'type' => 'php',
+                'file' => __FILE__, 'line' => __LINE__,
+                'message' => "Failed to load config from " . $rcube->config->get('markasjunk_sauserprefs_config')
+            ), true, false);
 
             return false;
         }
@@ -79,52 +75,40 @@ class markasjunk_sa_blacklist
 
         // check DB connections and exit on failure
         if ($err_str = $db->is_error()) {
-            rcube::raise_error([
-                    'code' => 603,
-                    'type' => 'db',
-                    'message' => $err_str
-                ], false, true
-            );
+            rcube::raise_error(array(
+                'code' => 603,
+                'type' => 'db',
+                'message' => $err_str
+            ), false, true);
         }
 
         foreach ($uids as $uid) {
             $message = new rcube_message($uid);
             $email   = $message->sender['mailto'];
 
-            // skip invalid emails
-            if (!rcube_utils::check_email($email, false)) {
-                continue;
-            }
-
             if ($spam) {
                 // delete any whitelisting for this address
                 $db->query(
-                    "DELETE FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? "
-                        . "AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
+                    "DELETE FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
                     $this->sa_user,
                     'whitelist_from',
-                    $email
-                );
+                    $email);
 
                 // check address is not already blacklisted
                 $sql_result = $db->query(
-                    "SELECT `value` FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? "
-                        . "AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
-                    $this->sa_user,
-                    'blacklist_from',
-                    $email
-                );
+                                "SELECT `value` FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
+                                $this->sa_user,
+                                'blacklist_from',
+                                $email);
 
                 if (!$db->fetch_array($sql_result)) {
                     $db->query(
-                        "INSERT INTO `{$this->sa_table}` (`{$this->sa_username_field}`, `{$this->sa_preference_field}`, `{$this->sa_value_field}`)"
-                            . " VALUES (?, ?, ?)",
+                        "INSERT INTO `{$this->sa_table}` (`{$this->sa_username_field}`, `{$this->sa_preference_field}`, `{$this->sa_value_field}`) VALUES (?, ?, ?)",
                         $this->sa_user,
                         'blacklist_from',
-                        $email
-                    );
+                        $email);
 
-                    if ($debug) {
+                    if ($rcube->config->get('markasjunk_debug')) {
                         rcube::write_log('markasjunk', $this->sa_user . ' blacklist ' . $email);
                     }
                 }
@@ -132,31 +116,26 @@ class markasjunk_sa_blacklist
             else {
                 // delete any blacklisting for this address
                 $db->query(
-                    "DELETE FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? AND "
-                        . "`{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
+                    "DELETE FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
                     $this->sa_user,
                     'blacklist_from',
-                    $email
-                );
+                    $email);
 
                 // check address is not already whitelisted
                 $sql_result = $db->query(
-                    "SELECT `value` FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? "
-                        . "AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
-                    $this->sa_user,
-                    'whitelist_from',
-                    $email
-                );
+                                "SELECT `value` FROM `{$this->sa_table}` WHERE `{$this->sa_username_field}` = ? AND `{$this->sa_preference_field}` = ? AND `{$this->sa_value_field}` = ?",
+                                $this->sa_user,
+                                'whitelist_from',
+                                $email);
 
                 if (!$db->fetch_array($sql_result)) {
                     $db->query(
-                        "INSERT INTO `{$this->sa_table}` (`{$this->sa_username_field}`, `{$this->sa_preference_field}`, `{$this->sa_value_field}`)"
-                            . " VALUES (?, ?, ?)",
+                        "INSERT INTO `{$this->sa_table}` (`{$this->sa_username_field}`, `{$this->sa_preference_field}`, `{$this->sa_value_field}`) VALUES (?, ?, ?)",
                         $this->sa_user,
                         'whitelist_from',
                         $email);
 
-                    if ($debug) {
+                    if ($rcube->config->get('markasjunk_debug')) {
                         rcube::write_log('markasjunk', $this->sa_user . ' whitelist ' . $email);
                     }
                 }

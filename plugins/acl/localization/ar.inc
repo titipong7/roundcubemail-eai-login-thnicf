@@ -28,3 +28,4 @@ $labels['shortacld'] = 'حذف';
 $labels['shortaclt'] = 'حذف';
 $labels['shortaclother'] = 'آخر';
 $labels['shortacldelete'] = 'حذف';
+?>

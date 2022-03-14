@@ -35,3 +35,4 @@ $labels['shortacla'] = 'مدیر';
 $labels['shortaclother'] = 'دیگر';
 $labels['shortaclread'] = 'خواندن';
 $labels['shortacldelete'] = 'حذف';
+?>

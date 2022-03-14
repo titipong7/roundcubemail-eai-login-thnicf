@@ -16,3 +16,4 @@
 
 $labels['help'] = 'Aßistançéu';
 $labels['about'] = 'Över';
+?>

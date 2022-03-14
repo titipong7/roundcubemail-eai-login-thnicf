@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Tampilkan emoticon dalam pesan teks polos';
 $labels['emoticonscompose'] = 'Fungsikan emoticon';
+?>

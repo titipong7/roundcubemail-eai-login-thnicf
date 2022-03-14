@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'Dosar original';
 $labels['archivetypesender'] = 'E-mail expeditor';
 $labels['unkownsender'] = 'necunoscut';
 $labels['readonarchive'] = 'Marchează mesajul ca citit în arhivă';
+?>

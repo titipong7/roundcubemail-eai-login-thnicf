@@ -22,3 +22,4 @@ $labels['settingstitle'] = 'أرشفة';
 $labels['archivetype'] = 'تقسيم الأرشيف بحسب';
 $labels['archivetypefolder'] = 'المجلد الأصلي';
 $labels['unkownsender'] = 'مجهول';
+?>
