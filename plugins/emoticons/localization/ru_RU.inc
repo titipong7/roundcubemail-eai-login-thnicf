@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Показывать смайлики в чисто текстовых сообщениях';
 $labels['emoticonscompose'] = 'Включить смайлики';
+?>

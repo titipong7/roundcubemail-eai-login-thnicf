@@ -17,3 +17,4 @@
 $labels['expiresnever'] = 'هېڅ';
 $labels['unknown'] = 'نامعلوم';
 $labels['newkeypass'] = 'پټنوم';
+?>

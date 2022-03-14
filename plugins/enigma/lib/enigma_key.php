@@ -18,8 +18,8 @@ class enigma_key
 {
     public $id;
     public $name;
-    public $users   = [];
-    public $subkeys = [];
+    public $users   = array();
+    public $subkeys = array();
     public $reference;
     public $password;
 
@@ -43,12 +43,10 @@ class enigma_key
 
     /**
      * Returns key type
-     *
-     * @return int One of self::TYPE_* constant values
      */
     function get_type()
     {
-        if (!empty($this->subkeys[0]) && $this->subkeys[0]->has_private) {
+        if ($this->subkeys[0]->has_private) {
             return enigma_key::TYPE_KEYPAIR;
         }
         else if (!empty($this->subkeys[0])) {
@@ -59,9 +57,7 @@ class enigma_key
     }
 
     /**
-     * Returns true if all subkeys are revoked
-     *
-     * @return bool
+     * Returns true if all user IDs are revoked
      */
     function is_revoked()
     {
@@ -71,13 +67,11 @@ class enigma_key
             }
         }
 
-        return !empty($this->subkeys);
+        return true;
     }
 
     /**
      * Returns true if any user ID is valid
-     *
-     * @return bool
      */
     function is_valid()
     {
@@ -91,9 +85,23 @@ class enigma_key
     }
 
     /**
+     * Returns true if any of subkeys is not expired
+     */
+    function is_expired()
+    {
+        $now = time();
+
+        foreach ($this->subkeys as $subkey) {
+            if (!$subkey->expires || $subkey->expires > $now) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if any of subkeys is a private key
-     *
-     * @return bool
      */
     function is_private()
     {
@@ -108,18 +116,15 @@ class enigma_key
 
     /**
      * Get key ID by user email
-     *
-     * @param string $email Email address
-     * @param int    $mode  Key mode (see self::CAN_* constants)
-     *
-     * @return enigma_subkey|null Subkey object
      */
     function find_subkey($email, $mode)
     {
+        $now = time();
+
         foreach ($this->users as $user) {
             if (strcasecmp($user->email, $email) === 0 && $user->valid && !$user->revoked) {
                 foreach ($this->subkeys as $subkey) {
-                    if (!$subkey->revoked && !$subkey->is_expired()) {
+                    if (!$subkey->revoked && (!$subkey->expires || $subkey->expires > $now)) {
                         if ($subkey->usage & $mode) {
                             return $subkey;
                         }
@@ -133,8 +138,7 @@ class enigma_key
      * Converts long ID or Fingerprint to short ID
      * Crypt_GPG uses internal, but e.g. Thunderbird's Enigmail displays short ID
      *
-     * @param string $id Key ID or fingerprint
-     *
+     * @param string Key ID or fingerprint
      * @return string Key short ID
      */
     static function format_id($id)
@@ -147,7 +151,7 @@ class enigma_key
     /**
      * Formats fingerprint string
      *
-     * @param string $fingerprint Key fingerprint
+     * @param string Key fingerprint
      *
      * @return string Formatted fingerprint (with spaces)
      */

@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Geef emoticons weer in tekst zonder opmaak';
 $labels['emoticonscompose'] = 'Activeer emoticons';
+?>

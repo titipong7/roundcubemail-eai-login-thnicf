@@ -18,4 +18,3 @@ $labels['userinfo'] = 'Gebruikersinformatie';
 $labels['created'] = 'Aangemaakt';
 $labels['lastlogin'] = 'Laatste aanmelding';
 $labels['defaultidentity'] = 'Standaardidentiteit';
-$labels['userid'] = 'ID';

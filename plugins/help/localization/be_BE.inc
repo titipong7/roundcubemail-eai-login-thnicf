@@ -17,3 +17,4 @@
 $labels['help'] = 'Дапамога';
 $labels['about'] = 'Апісанне';
 $labels['license'] = 'Ліцэнзія';
+?>

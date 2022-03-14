@@ -27,3 +27,4 @@ $labels['archivetypemonth'] = 'Ay (məs. Arxiv/2012/06)';
 $labels['archivetypefolder'] = 'Orijinal qovluq';
 $labels['archivetypesender'] = 'Göndərənin E-Poçtu';
 $labels['unkownsender'] = 'naməlum';
+?>

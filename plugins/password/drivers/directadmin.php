@@ -38,7 +38,7 @@ class rcube_directadmin_password
         $da_port    = $rcmail->config->get('password_directadmin_port');
 
         if (strpos($da_user, '@') === false) {
-            return ['code' => PASSWORD_ERROR, 'message' => 'Change the SYSTEM user password through control panel!'];
+            return array('code' => PASSWORD_ERROR, 'message' => 'Change the SYSTEM user password through control panel!');
         }
 
         $da_host = str_replace('%h', $_SESSION['imap_host'], $da_host);
@@ -46,25 +46,25 @@ class rcube_directadmin_password
 
         $Socket->connect($da_host,$da_port); 
         $Socket->set_method('POST');
-        $Socket->query('/CMD_CHANGE_EMAIL_PASSWORD', [
+        $Socket->query('/CMD_CHANGE_EMAIL_PASSWORD',
+            array(
                 'email'         => $da_user,
                 'oldpassword'   => $da_curpass,
                 'password1'     => $da_newpass,
                 'password2'     => $da_newpass,
                 'api'           => '1'
-        ]);
-
+            ));
         $response = $Socket->fetch_parsed_body();
 
         //DEBUG
         //rcube::console("Password Plugin: [USER: $da_user] [HOST: $da_host] - Response: [SOCKET: ".$Socket->result_status_code."] [DA ERROR: ".strip_tags($response['error'])."] [TEXT: ".$response[text]."]");
 
         if ($Socket->result_status_code != 200) {
-            return ['code' => PASSWORD_CONNECT_ERROR, 'message' => $Socket->error[0]];
+            return array('code' => PASSWORD_CONNECT_ERROR, 'message' => $Socket->error[0]);
         }
 
         if ($response['error'] == 1) {
-            return ['code' => PASSWORD_ERROR, 'message' => strip_tags($response['text'])];
+            return array('code' => PASSWORD_ERROR, 'message' => strip_tags($response['text']));
         }
 
         return PASSWORD_SUCCESS;
@@ -105,14 +105,14 @@ class HTTPSocket
 
     var $lastTransferSpeed;
     var $bind_host;
-    var $error       = [];
-    var $warn        = [];
-    var $query_cache = [];
+    var $error       = array();
+    var $warn        = array();
+    var $query_cache = array();
     var $doFollowLocationHeader = true;
     var $redirectURL;
     var $max_redirects = 5;
     var $ssl_setting_message = 'DirectAdmin appears to be using SSL. Change your script to connect to ssl://';
-    var $extra_headers = [];
+    var $extra_headers = array();
 
     /**
      * Create server "connection".
@@ -162,6 +162,7 @@ class HTTPSocket
         if (strlen($passwd) > 0) {
             $this->remote_passwd = $passwd;
         }
+
     }
 
     /**
@@ -172,7 +173,7 @@ class HTTPSocket
      */
     function query($request, $content = '')
     {
-        $this->error = $this->warn = [];
+        $this->error = $this->warn = array();
         $this->result_status_code  = null;
 
         $is_ssl = false;
@@ -187,13 +188,10 @@ class HTTPSocket
                 $this->connect('http://'.$location['host'],$location['port']);
             }
 
-            $this->set_login($location['user'], $location['pass']);
+            $this->set_login($location['user'],$location['pass']);
 
             $request = $location['path'];
-            
-            if ($content == '') {
-                $content = $location['query'];
-            }
+            $content = $location['query'];
 
             if (strlen($request) < 1) {
                 $request = '/';
@@ -212,11 +210,10 @@ class HTTPSocket
             $is_ssl = true;
         }
 
-        $array_headers = [
-            'Host'       => $this->remote_port == 80 ? $this->remote_host : "$this->remote_host:$this->remote_port",
-            'Accept'     => '*/*',
-            'Connection' => 'Close'
-        ];
+        $array_headers = array(
+            'Host' => $this->remote_port == 80 ? $this->remote_host : "$this->remote_host:$this->remote_port",
+            'Accept' => '*/*',
+            'Connection' => 'Close' );
 
         foreach ($this->extra_headers as $key => $value) {
             $array_headers[$key] = $value;
@@ -226,7 +223,7 @@ class HTTPSocket
 
         // was content sent as an array? if so, turn it into a string
         if (is_array($content)) {
-            $pairs = [];
+            $pairs = array();
 
             foreach ($content as $key => $value) {
                 $pairs[] = "$key=".urlencode($value);
@@ -287,8 +284,8 @@ class HTTPSocket
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $array_headers);
 
-        if (!($this->result = curl_exec($ch))) {
-            $this->error[] = curl_error($ch);
+        if(!($this->result = curl_exec($ch))) {
+            $this->error[] .= curl_error($ch);
             $OK = false;
         }
 
@@ -323,7 +320,7 @@ class HTTPSocket
 
                 $this->max_redirects--;
                 $this->redirectURL = $headers['location'];
-                $this->query($headers['location'], $content);
+                $this->query($headers['location']);
             }
         }
     }
@@ -336,9 +333,8 @@ class HTTPSocket
     /**
      * The quick way to get a URL's content :)
      *
-     * @param string $location URL
-     * @param bool   $asArray  return as array? (like PHP's file() command)
-     *
+     * @param string URL
+     * @param boolean return as array? (like PHP's file() command)
      * @return string result body
      */
     function get($location, $asArray = false)
@@ -347,7 +343,7 @@ class HTTPSocket
 
         if ($this->get_status_code() == 200) {
             if ($asArray) {
-                return preg_split("/\n/", $this->fetch_body());
+                return preg_split("/\n/",$this->fetch_body());
             }
 
             return $this->fetch_body();
@@ -375,7 +371,7 @@ class HTTPSocket
      * @param string header name
      * @param string header value
      */
-    function add_header($key, $value)
+    function add_header($key,$value)
     {
         $this->extra_headers[$key] = $value;
     }
@@ -386,7 +382,7 @@ class HTTPSocket
      */
     function clear_headers()
     {
-        $this->extra_headers = [];
+        $this->extra_headers = array();
     }
 
     /**
@@ -407,14 +403,14 @@ class HTTPSocket
      */
     function fetch_header($header = '')
     {
-        $array_headers = preg_split("/\r\n/", $this->result_header);
+        $array_headers = preg_split("/\r\n/",$this->result_header);
 
-        $array_return = [0 => $array_headers[0]];
+        $array_return = array(0 => $array_headers[0]);
         unset($array_headers[0]);
 
         foreach ($array_headers as $pair) {
             if ($pair == '' || $pair == "\r\n") continue;
-            list($key,$value) = preg_split("/: /", $pair, 2);
+            list($key,$value) = preg_split("/: /",$pair,2);
             $array_return[strtolower($key)] = $value;
         }
 
@@ -442,12 +438,12 @@ class HTTPSocket
      */
     function fetch_parsed_body()
     {
-        parse_str($this->result_body, $x);
+        parse_str($this->result_body,$x);
         return $x;
     }
 
     /**
-     * Set a specific message on how to change the SSL setting, in the event that it's not set correctly.
+     * Set a specifc message on how to change the SSL setting, in the event that it's not set correctly.
      */
     function set_ssl_setting_message($str)
     {

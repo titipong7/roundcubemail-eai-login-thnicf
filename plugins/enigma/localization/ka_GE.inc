@@ -18,3 +18,4 @@ $labels['keyname'] = 'სახელი';
 $labels['expiresnever'] = 'არასდროს';
 $labels['unknown'] = 'უცნობი';
 $labels['newkeypass'] = 'პაროლი';
+?>

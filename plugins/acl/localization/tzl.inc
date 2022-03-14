@@ -23,3 +23,4 @@ $labels['shortacld'] = 'Zeletarh';
 $labels['shortaclt'] = 'Zeletarh';
 $labels['shortaclread'] = 'Lirarh';
 $labels['shortacldelete'] = 'Zeletarh';
+?>

@@ -27,3 +27,4 @@ $labels['archivetypemonth'] = 'Сар (жиш: Архив/2012/06)';
 $labels['archivetypefolder'] = 'Жинхэнэ хавтас';
 $labels['archivetypesender'] = 'Илгээгчийн мэйл хаяг';
 $labels['unkownsender'] = 'мэдэгдэхгүй';
+?>

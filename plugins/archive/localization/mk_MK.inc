@@ -28,3 +28,4 @@ $labels['archivetypefolder'] = 'Оригинална папка ';
 $labels['archivetypesender'] = 'Електронска пошта на испраќач';
 $labels['unkownsender'] = 'Непознато ';
 $labels['readonarchive'] = 'Обележи ја пораката како прочитана на архивата ';
+?>

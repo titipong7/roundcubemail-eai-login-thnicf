@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Информация';
-$labels['infoforuser'] = 'Информация для $user';
 $labels['created'] = 'Создан';
 $labels['lastlogin'] = 'Последний вход';
 $labels['defaultidentity'] = 'Профиль по умолчанию';
-$labels['userid'] = 'ID';

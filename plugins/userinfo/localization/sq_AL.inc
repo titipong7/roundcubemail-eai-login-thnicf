@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Të dhëna Përdoruesi';
-$labels['infoforuser'] = 'Të dhëna mbi $user';
 $labels['created'] = 'Krijuar më';
 $labels['lastlogin'] = 'Hyrja e Fundit';
 $labels['defaultidentity'] = 'Identitet Parazgjedhje';
-$labels['userid'] = 'ID';

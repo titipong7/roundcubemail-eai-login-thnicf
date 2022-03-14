@@ -63,7 +63,8 @@ $labels['keyrevoke'] = 'Dizorniañ';
 $labels['keysend'] = 'Kas an alc\'hwez foran en ur gemennadenn';
 $labels['keychpass'] = 'Kemmañ ar ger-tremen';
 $labels['newkeypass'] = 'Ger-Tremen';
-$labels['newkeytype'] = 'Rizh an alc\'hwez';
+$labels['key2048'] = '2048 bit - dre ziouer';
+$labels['key4096'] = '4096 bit - diogeloc\'h';
 $labels['keygenerating'] = 'O c\'henel an alc\'hwezioù...';
 $labels['encryptionoptions'] = 'Dibarzhioù enrinegañ...';
 $labels['encryptmsg'] = 'Enrinegañ ar gemennadenn-mañ';
@@ -110,5 +111,4 @@ $messages['keygenerateerror'] = 'C\'hwitadenn war ganedigezh un daouad alc\'hwez
 $messages['keygeneratesuccess'] = 'Ganet hag enporzhiet eo bet un daouad alc\'hwezioù gant berzh. ';
 $messages['keygennosupport'] = 'N\'eo ket skoret an enrinegañ gant ho merdeer web. N\'haller ket genel un alc\'hwez nevez.';
 $messages['nonameident'] = 'Ret eo d\'ar pivelezh kaout un anv arveriad despizet!';
-$labels['key2048'] = '2048 bit - dre ziouer';
-$labels['key4096'] = '4096 bit - diogeloc\'h';
+?>

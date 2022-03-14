@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Rodyti jaustukus grynojo teksto laiškuose';
 $labels['emoticonscompose'] = 'Įgalinti jaustukus';
+?>

@@ -22,3 +22,4 @@ $labels['settingstitle'] = 'ارشیو';
 $labels['archivetypefolder'] = 'پوشه اصلی';
 $labels['archivetypesender'] = 'ایمیل فرستنده';
 $labels['unkownsender'] = 'نا شناس';
+?>

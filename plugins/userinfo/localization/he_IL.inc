@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'פרטי המשתמש';
-$labels['infoforuser'] = 'מידע עבור user$';
 $labels['created'] = 'נוצר';
 $labels['lastlogin'] = 'הכמיסה האחרונה למערכת';
 $labels['defaultidentity'] = 'זהות ברירת מחדל';
-$labels['userid'] = 'קוד זיהוי';

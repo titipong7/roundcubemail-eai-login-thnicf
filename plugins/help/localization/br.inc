@@ -18,3 +18,4 @@ $labels['help'] = 'Skoazell';
 $labels['about'] = 'Diwar-benn';
 $labels['license'] = 'Lañvaz';
 $labels['csrfinfo'] = 'Gouzout hiroc\'h a-zivout an CSRF ha penaos e warezomp ac\'hanoc\'h';
+?>

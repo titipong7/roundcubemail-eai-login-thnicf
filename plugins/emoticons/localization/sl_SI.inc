@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = 'Prikaži čustvenčke v tekstovnem načinu';
 $labels['emoticonscompose'] = 'Omogoči čustvenčke';
+?>

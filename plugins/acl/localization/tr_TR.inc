@@ -95,3 +95,4 @@ $messages['createerror'] = 'Erişim izinleri eklenemedi';
 $messages['deleteconfirm'] = 'Seçilmiş kullanıcılar için erişim izinlerini silmek istediğinize emin misiniz?';
 $messages['norights'] = 'Herhangi bir izin belirtilmemiş!';
 $messages['nouser'] = 'Herhangi bir kullanıcı belirtilmemiş!';
+?>

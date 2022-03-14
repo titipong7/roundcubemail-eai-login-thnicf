@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Uživatel';
-$labels['infoforuser'] = 'Informace pro $user';
 $labels['created'] = 'Vytvořen';
 $labels['lastlogin'] = 'Naspoledy přihlášen';
 $labels['defaultidentity'] = 'Výchozí identita';
-$labels['userid'] = 'ID';

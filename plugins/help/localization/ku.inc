@@ -17,3 +17,4 @@
 $labels['help'] = 'Alîkarî';
 $labels['about'] = 'Dervar';
 $labels['license'] = 'Lîsans';
+?>

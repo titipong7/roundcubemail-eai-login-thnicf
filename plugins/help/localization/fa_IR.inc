@@ -17,3 +17,4 @@
 $labels['help'] = 'راهنما';
 $labels['about'] = 'درباره';
 $labels['license'] = 'گواهینامه';
+?>

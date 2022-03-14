@@ -96,6 +96,7 @@ class rcmail_sendmail
         $mailcc  = $this->email_input_format(rcube_utils::get_input_value('_cc', rcube_utils::INPUT_POST, true, $charset), true);
         $mailbcc = $this->email_input_format(rcube_utils::get_input_value('_bcc', rcube_utils::INPUT_POST, true, $charset), true);
 
+        error_log($mailto);
         if ($this->parse_data['INVALID_EMAIL'] && !$this->options['savedraft']) {
             return $this->options['error_handler']('emailformaterror', 'error', array('email' => $this->parse_data['INVALID_EMAIL']));
         }
@@ -187,8 +188,8 @@ class rcmail_sendmail
 					$first_iden = rcmail::get_instance()->user->get_first_ident(null, true); //add new func in lib/roundcube/rcube_user.php:349
 					$iden_set=0;
 					foreach ($first_iden as $idx => $ident) {
-						if(preg_match('/\p{Thai}/u', $ident['email']) === 0 && $iden_set==0) {
-                        //if(preg_match('/^[ก-๙a-zA-Z0-9_+&*-]+(?:\.[ก-๙a-zA-Z0-9_+&*-]+)*@(?:[ก-๙a-zA-Z0-9-]+\.)+[ก-๙a-zA-Z]{2,16}$/u', $ident['email']) === 0 && $iden_set==0) {
+						// if(preg_match('/\p{Thai}/u', $ident['email']) === 0 && $iden_set==0) {
+                        if(preg_match('/^[ก-๙a-zA-Z0-9_+&*-]+(?:\.[ก-๙a-zA-Z0-9_+&*-]+)*@(?:[ก-๙a-zA-Z0-9-]+\.)+[ก-๙a-zA-Z]{2,16}$/u', $ident['email']) === 0 && $iden_set==0) {
 							//$iden=$ident['email'];
 							//$iden_id=$idx;
 							if($from_string)
@@ -789,6 +790,7 @@ class rcmail_sendmail
 
             // check address format
             $item = trim($item, '<>');
+            error_log("item::".$item);
             // if ($item && $check && !rcube_utils::check_email($item)) {
             if ($item && $check && !rcube_utils::check_email($item)) {    
                 $this->parse_data['INVALID_EMAIL'] = $item;

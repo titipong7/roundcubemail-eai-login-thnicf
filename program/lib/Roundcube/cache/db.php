@@ -20,7 +20,7 @@
 */
 
 /**
- * Interface implementation class for accessing SQL Database cache
+ * Interface class for accessing SQL Database cache
  *
  * @package    Framework
  * @subpackage Cache
@@ -43,19 +43,24 @@ class rcube_cache_db extends rcube_cache
 
 
     /**
-     * {@inheritdoc}
+     * Object constructor.
+     *
+     * @param int    $userid User identifier
+     * @param string $prefix Key name prefix
+     * @param string $ttl    Expiration time of memcache/apc items
+     * @param bool   $packed Enables/disabled data serialization.
+     *                       It's possible to disable data serialization if you're sure
+     *                       stored data will be always a safe string
      */
-    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true, $indexed = false)
+    public function __construct($userid, $prefix = '', $ttl = 0, $packed = true)
     {
-        parent::__construct($userid, $prefix, $ttl, $packed, $indexed);
+        parent::__construct($userid, $prefix, $ttl, $packed);
 
         $rcube = rcube::get_instance();
 
         $this->type  = 'db';
         $this->db    = $rcube->get_dbh();
         $this->table = $this->db->table_name($userid ? 'cache' : 'cache_shared', true);
-
-        $this->refresh_time *= 2;
     }
 
     /**
@@ -63,7 +68,7 @@ class rcube_cache_db extends rcube_cache
      */
     public function expunge()
     {
-        if ($this->ttl) {
+        if ($this->db && $this->ttl) {
             $this->db->query(
                 "DELETE FROM {$this->table} WHERE "
                 . ($this->userid ? "`user_id` = {$this->userid} AND " : "")
@@ -88,59 +93,69 @@ class rcube_cache_db extends rcube_cache
     /**
      * Reads cache entry.
      *
-     * @param string $key Cache key name
+     * @param string  $key     Cache key name
+     * @param boolean $nostore Enable to skip in-memory store
      *
      * @return mixed Cached value
      */
-    protected function read_record($key)
+    protected function read_record($key, $nostore=false)
     {
+        if (!$this->db) {
+            return;
+        }
+
         $sql_result = $this->db->query(
                 "SELECT `data`, `cache_key` FROM {$this->table} WHERE "
                 . ($this->userid ? "`user_id` = {$this->userid} AND " : "")
                 ."`cache_key` = ?",
                 $this->prefix . '.' . $key);
 
-        $data = null;
-
         if ($sql_arr = $this->db->fetch_assoc($sql_result)) {
             if (strlen($sql_arr['data']) > 0) {
-                $data = $this->unserialize($sql_arr['data']);
+                $md5sum = md5($sql_arr['data']);
+                $data   = $this->unserialize($sql_arr['data']);
             }
 
             $this->db->reset();
+
+            if ($nostore) {
+                return $data;
+            }
+
+            $this->cache[$key]      = $data;
+            $this->cache_sums[$key] = $md5sum;
+        }
+        else {
+            $this->cache[$key] = null;
         }
 
-        if (!$this->indexed) {
-            $this->cache[$key] = $data;
-        }
-
-        return $data;
+        return $this->cache[$key];
     }
 
     /**
      * Writes single cache record into DB.
      *
-     * @param string   $key  Cache key name
-     * @param mixed    $data Serialized cache data
-     * @param DateTime $ts   Timestamp
+     * @param string $key  Cache key name
+     * @param mixed  $data Serialized cache data
      *
-     * @param bool True on success, False on failure
+     * @param boolean True on success, False on failure
      */
-    protected function store_record($key, $data, $ts = null)
+    protected function write_record($key, $data)
     {
-        $value = $this->serialize($data);
-        $size  = strlen($value);
+        if (!$this->db) {
+            return false;
+        }
 
         // don't attempt to write too big data sets
-        if ($size > $this->max_packet_size()) {
-            trigger_error("rcube_cache: max_packet_size ($this->max_packet) exceeded for key $key. Tried to write $size bytes", E_USER_WARNING);
+        if (strlen($data) > $this->max_packet_size()) {
+            trigger_error("rcube_cache: max_packet_size ($this->max_packet) exceeded for key $key. Tried to write " . strlen($data) . " bytes", E_USER_WARNING);
             return false;
         }
 
         $db_key = $this->prefix . '.' . $key;
 
         // Remove NULL rows (here we don't need to check if the record exist)
-        if ($value == 'N;') {
+        if ($data == 'N;') {
             $result = $this->db->query(
                 "DELETE FROM {$this->table} WHERE "
                 . ($this->userid ? "`user_id` = {$this->userid} AND " : "")
@@ -150,18 +165,39 @@ class rcube_cache_db extends rcube_cache
             return !$this->db->is_error($result);
         }
 
-        $expires = $this->db->param($this->ttl ? $this->db->now($this->ttl) : 'NULL', rcube_db::TYPE_SQL);
-        $pkey    = ['cache_key' => $db_key];
+        $key_exists = array_key_exists($key, $this->cache_sums);
+        $expires    = $this->ttl ? $this->db->now($this->ttl) : 'NULL';
 
-        if ($this->userid) {
-            $pkey['user_id'] = $this->userid;
+        if (!$key_exists) {
+            // Try INSERT temporarily ignoring "duplicate key" errors
+            $this->db->set_option('ignore_key_errors', true);
+
+            if ($this->userid) {
+                $result = $this->db->query(
+                    "INSERT INTO {$this->table} (`expires`, `user_id`, `cache_key`, `data`)"
+                    . " VALUES ($expires, ?, ?, ?)",
+                    $this->userid, $db_key, $data);
+            }
+            else {
+                $result = $this->db->query(
+                    "INSERT INTO {$this->table} (`expires`, `cache_key`, `data`)"
+                    . " VALUES ($expires, ?, ?)",
+                    $db_key, $data);
+            }
+
+            $this->db->set_option('ignore_key_errors', false);
         }
 
-        $result = $this->db->insert_or_update(
-            $this->table, $pkey, ['expires', 'data'], [$expires, $value]
-        );
+        // otherwise try UPDATE
+        if (!isset($result) || !($count = $this->db->affected_rows($result))) {
+            $result = $this->db->query(
+                "UPDATE {$this->table} SET `expires` = $expires, `data` = ? WHERE "
+                . ($this->userid ? "`user_id` = {$this->userid} AND " : "")
+                . "`cache_key` = ?",
+                $data, $db_key);
 
-        $count = $this->db->affected_rows($result);
+            $count = $this->db->affected_rows($result);
+        }
 
         return $count > 0;
     }
@@ -169,30 +205,27 @@ class rcube_cache_db extends rcube_cache
     /**
      * Deletes the cache record(s).
      *
-     * @param string $key         Cache key name or pattern
-     * @param bool   $prefix_mode Enable it to clear all keys starting
-     *                            with prefix specified in $key
+     * @param string  $key         Cache key name or pattern
+     * @param boolean $prefix_mode Enable it to clear all keys starting
+     *                             with prefix specified in $key
      */
     protected function remove_record($key = null, $prefix_mode = false)
     {
+        if (!$this->db) {
+            return;
+        }
+
         // Remove all keys (in specified cache)
         if ($key === null) {
             $where = "`cache_key` LIKE " . $this->db->quote($this->prefix . '.%');
-            $this->cache = [];
         }
         // Remove keys by name prefix
         else if ($prefix_mode) {
             $where = "`cache_key` LIKE " . $this->db->quote($this->prefix . '.' . $key . '%');
-            foreach (array_keys($this->cache) as $k) {
-                if (strpos($k, $key) === 0) {
-                    $this->cache[$k] = null;
-                }
-            }
         }
         // Remove one key by name
         else {
             $where = "`cache_key` = " . $this->db->quote($this->prefix . '.' . $key);
-            $this->cache[$key] = null;
         }
 
         $this->db->query(
@@ -206,7 +239,7 @@ class rcube_cache_db extends rcube_cache
      */
     protected function serialize($data)
     {
-        return $this->db->encode($data, $this->packed);
+        return $this->db ? $this->db->encode($data, $this->packed) : false;
     }
 
     /**
@@ -214,7 +247,7 @@ class rcube_cache_db extends rcube_cache
      */
     protected function unserialize($data)
     {
-        return $this->db->decode($data, $this->packed);
+        return $this->db ? $this->db->decode($data, $this->packed) : false;
     }
 
     /**

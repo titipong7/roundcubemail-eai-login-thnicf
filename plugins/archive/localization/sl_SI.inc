@@ -29,3 +29,4 @@ $labels['archivetypefolder'] = 'Izvorna mapa';
 $labels['archivetypesender'] = 'Naslov pošiljatelja';
 $labels['unkownsender'] = 'neznan';
 $labels['readonarchive'] = 'Ob arhiviranju označi sporočilo kot prebrano';
+?>

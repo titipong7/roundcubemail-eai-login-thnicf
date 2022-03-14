@@ -15,8 +15,6 @@
 */
 
 $labels['userinfo'] = 'Informació de l\'usuari';
-$labels['infoforuser'] = 'Informació per a $user';
 $labels['created'] = 'Creat';
-$labels['lastlogin'] = 'Darrera connexió';
+$labels['lastlogin'] = 'Última connexió';
 $labels['defaultidentity'] = 'Identitat per defecte';
-$labels['userid'] = 'ID';

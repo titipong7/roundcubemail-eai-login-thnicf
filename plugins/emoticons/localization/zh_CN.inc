@@ -16,3 +16,4 @@
 
 $labels['emoticonsdisplay'] = '显示纯文本消息的表情';
 $labels['emoticonscompose'] = '启用表情';
+?>

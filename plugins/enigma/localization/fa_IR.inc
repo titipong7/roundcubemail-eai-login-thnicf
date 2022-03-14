@@ -24,3 +24,4 @@ $labels['expiresnever'] = 'هرگز';
 $labels['unknown'] = 'ناشناخته';
 $labels['keychpass'] = 'تغییر گذرواژه';
 $labels['newkeypass'] = 'گذرواژه';
+?>

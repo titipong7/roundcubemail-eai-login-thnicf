@@ -26,8 +26,7 @@ $labels['archivetypeyear'] = 'Yıl (Arşiv/2012)';
 $labels['archivetypemonth'] = 'Ay (Arşiv/2012/06)';
 $labels['archivetypetbmonth'] = 'Ay - Thunderbird uyumlu (Arsiv2012/2012-06 gibi)';
 $labels['archivetypefolder'] = 'Özgün klasör';
-$labels['archivetypefolderyear'] = 'Yıl ve özgün klasör (Örnek: Arşiv/2012 ...)';
-$labels['archivetypefoldermonth'] = 'Yıl, ay ve özgün klasör (Örnek: Arşiv/2012/06 ...)';
 $labels['archivetypesender'] = 'Gönderici adresi';
 $labels['unkownsender'] = 'bilinmeyen';
 $labels['readonarchive'] = 'Arşivdeki ileti okunmuş olarak işaretlensin';
+?>
