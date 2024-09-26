@@ -66,8 +66,8 @@ class rcube_utils
     public static function check_email($email, $dns_check=true)
     {
         // Check for invalid (control) characters
-        if (!preg_match("/^[ก-๙a-zA-Z0-9_+&*-]+(?:\.[ก-๙a-zA-Z0-9_+&*-]+)*@(?:[ก-๙a-zA-Z0-9-]+\.)+[ก-๙a-zA-Z]{2,16}$/u", $email)) {
-        // if (preg_match('/\p{Cc}/u', $email)) {
+        // if (!preg_match("/^[ก-๙a-zA-Z0-9_+&*-]+(?:\.[ก-๙a-zA-Z0-9_+&*-]+)*@(?:[ก-๙a-zA-Z0-9-]+\.)+[ก-๙a-zA-Z]{2,16}$/u", $email)) {
+        if (preg_match('/\p{Cc}/u', $email)) {
             return false;
         }
 
